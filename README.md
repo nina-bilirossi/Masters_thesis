@@ -1,5 +1,5 @@
-Welcome to my master's thesis GitHub repository.
-
+**Welcome to my master's thesis GitHub repository.
+**
 To run the regressions using the pre-processed data:
 
 1. Download the R project (R folder)
