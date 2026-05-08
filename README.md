@@ -1,3 +1,5 @@
+Welcome to my master's thesis GitHub repository.
+
 To run the regressions using the pre-processed data:
 
 1. Download the R project (R folder)
@@ -14,3 +16,6 @@ To do everything from scratch:
 2. Download the satellite data using the data_retrieval_copernicus_thesis.
 3. Process the data using the python files in the 'Python' folder.
 4. Download the PLFS data and run the code in R > Data cleaning.
+
+
+If any questions, you can reach me by email.
