@@ -13,8 +13,10 @@ To run the regressions using the pre-processed data:
 To do everything from scratch:
 
 1. Download the shapefiles (.shp, .gpx, ...) and population raster (.tif):
+   
     boundaries: https://surveyofindia.gov.in/pages/administrative-boundary-data-base-abdb-
            I couldn’t find the date for that shapefile/boundary definition but observing that Andhra Pradesh has 26 districts instead of 13, I deduct that the data is post-April 2022.
+   
     population raster: https://hub.worldpop.org/geodata/summary?id=6527
 3. Download the satellite data using the data_retrieval_copernicus_thesis.
 4. Process the data using the python files in the 'Python' folder.
