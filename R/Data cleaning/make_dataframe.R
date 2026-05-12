@@ -10,6 +10,11 @@ flood_index <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code
 spei_index <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/spei_with_lags.csv")
 population <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/state_population.csv")
 plfs_data <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/plfs/new-PLFS_all_s_N_unw.csv')
+extreme_events <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/combined_states_scores_new.csv") |> 
+  filter(custom_year >= 2013)
+
+length(unique(flood_index$STATE_UT)) # 35 states/UTs
+length(unique(extreme_events$STATE_UT))
 
 # --------- PLFS NAME MATCHING ------------
 # clean the plfs names so that it matches the rest
@@ -47,7 +52,7 @@ plfs_data <- plfs_data %>%
 
 # alles guet
 
-# --- ADDING LAGS TO THE FLOOD INDEX ---
+# --- ADDING LAGS TO THE FLOOD INDEX AND PR INDEX ---
 flood_index_lags <- flood_index |> 
   arrange(STATE_UT, hydro_year) |> 
   group_by(STATE_UT) |> 
@@ -59,6 +64,18 @@ flood_index_lags <- flood_index |>
   ungroup() |> 
   filter(hydro_year >= 2014) |>  # keep only years since 2014 (since PLFS data starts in 2017, and we want to keep 3 lags)
   mutate(STATE_UT = recode(STATE_UT, "ANDAMAN AND NICOBAR ISLANDS" = "ANDAMAN & NICOBAR"))
+
+extreme_events_lags <- extreme_events |> 
+  arrange(STATE_UT, custom_year) |> 
+  group_by(STATE_UT) |> 
+  mutate(
+    pr_lag1 = dplyr::lag(weighted_score, 1),  # previous year
+    pr_lag2 = dplyr::lag(weighted_score, 2),  # 2 years ago
+    pr_lag3 = dplyr::lag(weighted_score, 3)   # 3 years ago
+  ) |> 
+  rename(pr_score = weighted_score) |>
+  ungroup() |> 
+  filter(custom_year >= 2014)
 
 # --- GENERAL CLEANING ---
 
@@ -77,11 +94,15 @@ spei_index <- spei_index |>
 # --- JOIN JOIN JOIN JOIN ---
 
 spei_clean <- spei_index |> dplyr::select(-year) |> rename(year = year_start)
-flood_clean <- flood_index_lags |> rename(year = hydro_year) |> rename(STATE = STATE_UT)
+flood_clean <- flood_index_lags |> rename(year = hydro_year) |> rename(STATE = STATE_UT) |> 
+  mutate(STATE = recode(STATE, "UTTAR>KHAND" = "UTTARAKHAND"))
 plfs_clean <- plfs_data |> mutate(year = as.numeric(str_extract(time, "\\d{4}"))) |>  rename(STATE = state_name)
+xtreme_pr_clean <- extreme_events_lags |> rename(year = custom_year) |> rename(STATE = STATE_UT) |> 
+  mutate(STATE = recode(STATE, "ANDAMAN AND NICOBAR ISLANDS" = "ANDAMAN & NICOBAR"))
+
 
 # List of dataframes to join
-data_list <- list(spei_clean, flood_clean, plfs_clean)
+data_list <- list(spei_clean, flood_clean, plfs_clean, xtreme_pr_clean)
 
 # Join the first three (assuming they all have state AND year)
 final_df <- data_list %>% 
