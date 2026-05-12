@@ -1,0 +1,27 @@
+**Welcome to my master's thesis GitHub repository.**
+
+To run the regressions using the pre-processed data:
+
+1. Download the R project (R folder)
+2. Download the .csv regression data file: data > final > regression_data.csv
+    This contains wide-format data with our variables of interest:
+       informality shares (general, male/female, rural/urban) according to the PS definition,
+       flood index and lags
+       drought index and lags
+4. in the R project, navigate to R > Regression, and run the code there.
+
+To do everything from scratch:
+
+1. Download the shapefiles (.shp, .gpx, ...) and population raster (.tif):
+   
+    boundaries: https://surveyofindia.gov.in/pages/administrative-boundary-data-base-abdb-
+           I couldn’t find the date for that shapefile/boundary definition but observing that Andhra Pradesh has 26 districts instead of 13, I deduct that the data is post-April 2022.
+   
+    population raster: https://hub.worldpop.org/geodata/summary?id=6527
+3. Download the satellite data using the Python/data_retrieval_copernicus_thesis.ipynb (instriuctions to connect to GEE are included there).
+4. Process the data using the python files in the 'Python' folder, in the order indicated by the numbers.
+5. Download the PLFS data and run the code in R > Data cleaning.
+6. Run the regressions.
+
+
+If any questions, you can reach me by email!
