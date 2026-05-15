@@ -4,25 +4,6 @@ library(vars)
 library(sandwich)
 library(stargazer)
 
-data <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe.csv") |> 
-  filter(STATE != "LAKSHADWEEP")
-colnames(data)
-
-# > colnames(data)
-#  [1] "STATE"                    "spei_spei12"              "spei_negative"            "spei_positive"            "spei_spei_lag1"          
-#  [6] "spei_spei_lag2"           "spei_spei_lag3"           "spei_neg_spei_lag1"       "spei_neg_spei_lag2"       "spei_neg_spei_lag3"      
-# [11] "year"                     "FI_state"                 "FI_lag1"                  "FI_lag2"                  "FI_lag3"                 
-# [16] "s_casual_w_lf_PS_unw"     "s_casual_w_lf_P_unw"      "s_casual_w_lf_PS_m_unw"   "s_casual_w_lf_P_m_unw"    "s_casual_w_lf_PS_f_unw"  
-# [21] "s_casual_w_lf_P_f_unw"    "s_casual_w_lf_PS_rur_unw" "s_casual_w_lf_P_rur_unw"  "s_casual_w_lf_PS_urb_unw" "s_casual_w_lf_P_urb_unw" 
-# [26] "data"                     "time"                     "state_pop"   
-
-data_flood <- data |> 
-  filter(STATE != "ARUNACHAL PRADESH") |> # drop this state since it has missing data for the flood variable
-  filter(STATE != "MEGHALAYA") 
-
-pdata_flood <- pdata.frame(data_flood, index = c("STATE", "year"))
-pdata <- pdata.frame(data, index = c("STATE", "year"))
-
 # --- LAG SELECTION ---
 # finding the optimal lags for spei and flood index (seprarately)
 
@@ -44,7 +25,7 @@ optimal_lags_pr <- data.frame(Lags = 1:3, AIC = NA, BIC = NA)
 
 for (i in 1:3) {
   lags_to_include <- paste0("spei_neg_spei_lag", 1:i)
-  formula_str <- paste("s_casual_w_lf_PS_unw ~ spei_negative +", paste(lags_to_include, collapse = " + "))
+  formula_str <- paste("s_casual_w_worker_PS_unw ~ spei_negative +", paste(lags_to_include, collapse = " + "))
   
   # Run Fixed Effects (within) model
   fit <- plm(as.formula(formula_str), data = pdata, model = "within")
@@ -57,10 +38,10 @@ for (i in 1:3) {
 
 for (i in 1:3) {
   lags_to_include <- paste0("FI_lag", 1:i)
-  formula_str <- paste("s_casual_w_lf_PS_unw ~ FI_state +", paste(lags_to_include, collapse = " + "))
+  formula_str <- paste("s_casual_w_worker_PS_unw ~ FI_state +", paste(lags_to_include, collapse = " + "))
   
   # Run Fixed Effects (within) model
-  fit <- plm(as.formula(formula_str), data = pdata_flood, model = "within")
+  fit <- plm(as.formula(formula_str), data = pdata_fi, model = "within")
   
   # Store results
   metrics <- extract_aic_plm(fit)
@@ -70,7 +51,7 @@ for (i in 1:3) {
 
 for (i in 1:3) {
   lags_to_include <- paste0("pr_lag", 1:i)
-  formula_str <- paste("s_casual_w_lf_PS_unw ~ pr_score +", paste(lags_to_include, collapse = " + "))
+  formula_str <- paste("s_casual_w_worker_PS_unw ~ pr_score +", paste(lags_to_include, collapse = " + "))
   
   # Run Fixed Effects (within) model
   fit <- plm(as.formula(formula_str), data = pdata, model = "within")

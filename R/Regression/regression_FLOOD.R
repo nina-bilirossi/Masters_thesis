@@ -1,10 +1,4 @@
-library(plm)
-library(lmtest)
-library(vars)
-library(sandwich)
-library(stargazer)
-library(dplyr)
-
+# REGRESSING ON WORKERS
 
 # We run a regression with the optimal lags for Flood Index (2 lags for both) and we report the results in a stargazer table.
 # Specifications:
@@ -17,44 +11,27 @@ library(dplyr)
 out <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/latex food/FLOOD"
 dir.create(out, recursive = TRUE, showWarnings = FALSE)
 
-# ── Load data ──────────────────────────────────────────────────────────────────
-data <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe.csv") |>
-  filter(STATE != "LAKSHADWEEP")
-
-data_flood <- data |> # drop those states since they have missing data for the flood variable
-  filter(STATE != "ARUNACHAL PRADESH") |>   # missing FI data
-  filter(STATE != "MEGHALAYA")               # missing FI data
-
-# ── Panel setup ────────────────────────────────────────────────────────────────
-pdata_fi <- pdata.frame(data_flood, index = c("STATE", "year"))   # for FI index
-pdata_pr <- pdata.frame(data,       index = c("STATE", "year"))   # for PR index (all states)
-
-# ── Helper: clustered SE at state level ───────────────────────────────────────
-cluster_se <- function(model) {
-  coeftest(model, vcov = vcovHC(model, type = "HC1", cluster = "group"))
-}
-
 # ── Informality measure ───────────────────────────────────────────────────────
-# s_casual_w_lf_PS_unw  (PS = principal + subsidiary status, unweighted)
+# s_casual_w_worker_PS_unw  (PS = principal + subsidiary status, unweighted)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TABLE 1 – FI Index with 2 lags (restricted sample: excl. ARUNACHAL & MEGHALAYA)
 # ══════════════════════════════════════════════════════════════════════════════
 
 # Spec 1a: contemporaneous only
-m1a <- plm(s_casual_w_lf_PS_unw ~ FI_state,
+m1a <- plm(s_casual_w_worker_PS_unw ~ FI_state,
            data   = pdata_fi,
            model  = "within",
            effect = "twoways")
 
 # Spec 1b: + lag 1
-m1b <- plm(s_casual_w_lf_PS_unw ~ FI_state + FI_lag1,
+m1b <- plm(s_casual_w_worker_PS_unw ~ FI_state + FI_lag1,
            data   = pdata_fi,
            model  = "within",
            effect = "twoways")
 
 # Spec 1c: + lag 1 & lag 2  (optimal)
-m1c <- plm(s_casual_w_lf_PS_unw ~ FI_state + FI_lag1 + FI_lag2,
+m1c <- plm(s_casual_w_worker_PS_unw ~ FI_state + FI_lag1 + FI_lag2,
            data   = pdata_fi,
            model  = "within",
            effect = "twoways")
@@ -78,7 +55,7 @@ stargazer(
   omit.stat    = c("f", "ser"),
   notes        = "Clustered standard errors at the state level in parentheses. Sample excludes LAKSHADWEEP, ARUNACHAL PRADESH, and MEGHALAYA due to missing flood index data.",
   notes.append = FALSE,
-  out          = file.path(out, "table1_FI_index.tex"),
+  out          = file.path(out, "table1_FI_index_workers.tex"),
   type         = "latex",
   label        = "tab:fi_index"
 )
@@ -90,20 +67,20 @@ cat("✓ Table 1 (FI Index) saved.\n")
 # ══════════════════════════════════════════════════════════════════════════════
 
 # Spec 2a: contemporaneous only
-m2a <- plm(s_casual_w_lf_PS_unw ~ spei_positive,
-           data   = pdata_pr,
+m2a <- plm(s_casual_w_worker_PS_unw ~ pr_score,
+           data   = pdata,
            model  = "within",
            effect = "twoways")
 
 # Spec 2b: + lag 1
-m2b <- plm(s_casual_w_lf_PS_unw ~ spei_positive + spei_spei_lag1,
-           data   = pdata_pr,
+m2b <- plm(s_casual_w_worker_PS_unw ~ pr_score + pr_lag1,
+           data   = pdata,
            model  = "within",
            effect = "twoways")
 
 # Spec 2c: + lag 1 & lag 2  (optimal)
-m2c <- plm(s_casual_w_lf_PS_unw ~ spei_positive + spei_spei_lag1 + spei_spei_lag2,
-           data   = pdata_pr,
+m2c <- plm(s_casual_w_worker_PS_unw ~  pr_score + pr_lag1 + pr_lag2,
+           data   = pdata,
            model  = "within",
            effect = "twoways")
 
@@ -128,7 +105,7 @@ stargazer(
   omit.stat    = c("f", "ser"),
   notes        = "Clustered standard errors at the state level in parentheses. Sample excludes LAKSHADWEEP only. PR index captures positive SPEI (excess precipitation) episodes.",
   notes.append = FALSE,
-  out          = file.path(out, "table2_PR_index.tex"),
+  out          = file.path(out, "table2_PR_index_workers.tex"),
   type         = "latex",
   label        = "tab:pr_index"
 )
@@ -159,7 +136,7 @@ stargazer(
   omit.stat    = c("f", "ser"),
   notes        = "Clustered standard errors at the state level in parentheses. FI column excludes ARUNACHAL PRADESH and MEGHALAYA due to missing data; PR column uses full sample (excl. LAKSHADWEEP).",
   notes.append = FALSE,
-  out          = file.path(out, "table3_FI_vs_PR.tex"),
+  out          = file.path(out, "table3_FI_vs_PR_workers.tex"),
   type         = "latex",
   label        = "tab:fi_vs_pr"
 )

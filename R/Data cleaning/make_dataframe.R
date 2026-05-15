@@ -13,6 +13,9 @@ plfs_data <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/O
 extreme_events <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/combined_states_scores_new.csv") |> 
   filter(custom_year >= 2013)
 
+# plfs_deeper <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/My data prep/PLFS processed/deeper-PLFS_all_s_N_unw.csv')
+# plfs_data <- plfs_deeper
+
 length(unique(flood_index$STATE_UT)) # 35 states/UTs
 length(unique(extreme_events$STATE_UT))
 
@@ -119,5 +122,5 @@ if("year" %in% colnames(population_clean)){
 
 final_df <- final_df |> filter(year >= 2017) # keep only years since 2017, since PLFS data starts in 2017
 
-write.csv(final_df, "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe.csv", row.names = FALSE)
+write.csv(final_df, "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe_xxx.csv", row.names = FALSE)
 colnames(final_df)

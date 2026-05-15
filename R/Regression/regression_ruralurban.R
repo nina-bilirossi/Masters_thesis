@@ -1,42 +1,20 @@
-library(plm)
-library(lmtest)
-library(sandwich)
-library(stargazer)
-library(dplyr)
-
+# REGRESSING ON WORKERS
 # ── Output paths ───────────────────────────────────────────────────────────────
 out  <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/latex food/robustness"
 dir.create(out,  recursive = TRUE, showWarnings = FALSE)
 
-# ── Load data ──────────────────────────────────────────────────────────────────
-data <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe.csv") |>
-  filter(STATE != "LAKSHADWEEP")
-
-data_flood <- data |>
-  filter(STATE != "ARUNACHAL PRADESH") |>
-  filter(STATE != "MEGHALAYA")
-
-# ── Panel setup ────────────────────────────────────────────────────────────────
-pdata_spei  <- pdata.frame(data,       index = c("STATE", "year"))
-pdata_flood <- pdata.frame(data_flood, index = c("STATE", "year"))
-
-# ── Helper: clustered SE at state level ───────────────────────────────────────
-cluster_se <- function(model) {
-  coeftest(model, vcov = vcovHC(model, type = "HC1", cluster = "group"))
-}
-
 # ══════════════════════════════════════════════════════════════════════════════
 # SPEI — Sector subgroups (optimal spec: contemp. + lag1 + lag2)
-# Rural outcome:  s_casual_w_lf_PS_rur_unw
-# Urban outcome: s_casual_w_lf_PS_urb_unw
+# Rural outcome:  s_casual_w_worker_PS_rur_unw
+# Urban outcome: s_casual_w_worker_PS_urb_unw
 # ══════════════════════════════════════════════════════════════════════════════
 
 # ── Full SPEI ──────────────────────────────────────────────────────────────────
-spei_full_r <- plm(s_casual_w_lf_PS_rur_unw ~ spei_spei12 + spei_spei_lag1 + spei_spei_lag2,
-                   data = pdata_spei, model = "within", effect = "twoways")
+spei_full_r <- plm(s_casual_w_worker_PS_rur_unw ~ spei_spei12 + spei_spei_lag1 + spei_spei_lag2,
+                   data = pdata, model = "within", effect = "twoways")
 
-spei_full_u <- plm(s_casual_w_lf_PS_urb_unw ~ spei_spei12 + spei_spei_lag1 + spei_spei_lag2,
-                   data = pdata_spei, model = "within", effect = "twoways")
+spei_full_u <- plm(s_casual_w_worker_PS_urb_unw ~ spei_spei12 + spei_spei_lag1 + spei_spei_lag2,
+                   data = pdata, model = "within", effect = "twoways")
 
 se_spei_full_r <- cluster_se(spei_full_r)
 se_spei_full_u <- cluster_se(spei_full_u)
@@ -57,18 +35,18 @@ stargazer(
   omit.stat    = c("f", "ser"),
   notes        = "Clustered standard errors at the state level in parentheses.",
   notes.append = FALSE,
-  out          = file.path(out, "table_sector_full_spei.tex"),
+  out          = file.path(out, "table_sector_full_spei_workers.tex"),
   type         = "latex",
   label        = "tab:sector_full_spei"
 )
 cat("✓ SPEI Full — sector table saved.\n")
 
 # ── Negative SPEI ─────────────────────────────────────────────────────────────
-spei_neg_r <- plm(s_casual_w_lf_PS_rur_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2,
-                  data = pdata_spei, model = "within", effect = "twoways")
+spei_neg_r <- plm(s_casual_w_worker_PS_rur_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2,
+                  data = pdata, model = "within", effect = "twoways")
 
-spei_neg_u <- plm(s_casual_w_lf_PS_urb_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2,
-                  data = pdata_spei, model = "within", effect = "twoways")
+spei_neg_u <- plm(s_casual_w_worker_PS_urb_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2,
+                  data = pdata, model = "within", effect = "twoways")
 
 se_spei_neg_r <- cluster_se(spei_neg_r)
 se_spei_neg_u <- cluster_se(spei_neg_u)
@@ -89,7 +67,7 @@ stargazer(
   omit.stat    = c("f", "ser"),
   notes        = "Clustered standard errors at the state level in parentheses.",
   notes.append = FALSE,
-  out          = file.path(out, "table_sector_neg_spei.tex"),
+  out          = file.path(out, "table_sector_neg_spei_workers.tex"),
   type         = "latex",
   label        = "tab:sector_neg_spei"
 )
@@ -100,11 +78,11 @@ cat("✓ SPEI Negative — sector table saved.\n")
 # ══════════════════════════════════════════════════════════════════════════════
 
 # ── FI Index ───────────────────────────────────────────────────────────────────
-fi_r <- plm(s_casual_w_lf_PS_rur_unw ~ FI_state + FI_lag1 + FI_lag2,
-            data = pdata_flood, model = "within", effect = "twoways")
+fi_r <- plm(s_casual_w_worker_PS_rur_unw ~ FI_state + FI_lag1 + FI_lag2,
+            data = pdata_fi, model = "within", effect = "twoways")
 
-fi_u <- plm(s_casual_w_lf_PS_urb_unw ~ FI_state + FI_lag1 + FI_lag2,
-            data = pdata_flood, model = "within", effect = "twoways")
+fi_u <- plm(s_casual_w_worker_PS_urb_unw ~ FI_state + FI_lag1 + FI_lag2,
+            data = pdata_fi, model = "within", effect = "twoways")
 
 se_fi_r <- cluster_se(fi_r)
 se_fi_u <- cluster_se(fi_u)
@@ -125,18 +103,18 @@ stargazer(
   omit.stat    = c("f", "ser"),
   notes        = "Clustered standard errors at the state level in parentheses.", 
   notes.append = FALSE,
-  out          = file.path(out, "table_sector_FI.tex"),
+  out          = file.path(out, "table_sector_FI_workers.tex"),
   type         = "latex",
   label        = "tab:sector_fi"
 )
 cat("✓ FI Index — sector table saved.\n")
 
 # ── PR Index ───────────────────────────────────────────────────────────────────
-pr_r <- plm(s_casual_w_lf_PS_rur_unw ~ spei_positive + spei_spei_lag1 + spei_spei_lag2,
-            data = pdata_spei, model = "within", effect = "twoways")
+pr_r <- plm(s_casual_w_worker_PS_rur_unw ~ spei_positive + spei_spei_lag1 + spei_spei_lag2,
+            data = pdata, model = "within", effect = "twoways")
 
-pr_u <- plm(s_casual_w_lf_PS_urb_unw ~ spei_positive + spei_spei_lag1 + spei_spei_lag2,
-            data = pdata_spei, model = "within", effect = "twoways")
+pr_u <- plm(s_casual_w_worker_PS_urb_unw ~ spei_positive + spei_spei_lag1 + spei_spei_lag2,
+            data = pdata, model = "within", effect = "twoways")
 
 se_pr_r <- cluster_se(pr_r)
 se_pr_u <- cluster_se(pr_u)
@@ -157,7 +135,7 @@ stargazer(
   omit.stat    = c("f", "ser"),
   notes        = "Clustered standard errors at the state level in parentheses.", 
   notes.append = FALSE,
-  out          = file.path(out, "table_sector_PR.tex"),
+  out          = file.path(out, "table_sector_PR_workers.tex"),
   type         = "latex",
   label        = "tab:sector_pr"
 )

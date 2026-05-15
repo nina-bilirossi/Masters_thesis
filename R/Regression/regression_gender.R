@@ -1,42 +1,21 @@
-library(plm)
-library(lmtest)
-library(sandwich)
-library(stargazer)
-library(dplyr)
+# REGRESSING ON WORKERS
 
 # ── Output paths ───────────────────────────────────────────────────────────────
 out  <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/latex food/robustness"
 dir.create(out,  recursive = TRUE, showWarnings = FALSE)
 
-# ── Load data ──────────────────────────────────────────────────────────────────
-data <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe.csv") |>
-  filter(STATE != "LAKSHADWEEP")
-
-data_flood <- data |>
-  filter(STATE != "ARUNACHAL PRADESH") |>
-  filter(STATE != "MEGHALAYA")
-
-# ── Panel setup ────────────────────────────────────────────────────────────────
-pdata_spei  <- pdata.frame(data,       index = c("STATE", "year"))
-pdata_flood <- pdata.frame(data_flood, index = c("STATE", "year"))
-
-# ── Helper: clustered SE at state level ───────────────────────────────────────
-cluster_se <- function(model) {
-  coeftest(model, vcov = vcovHC(model, type = "HC1", cluster = "group"))
-}
-
 # ══════════════════════════════════════════════════════════════════════════════
 # SPEI — Gender subgroups (optimal spec: contemp. + lag1 + lag2)
-# Male outcome:   s_casual_w_lf_PS_m_unw
-# Female outcome: s_casual_w_lf_PS_f_unw
+# Male outcome:   s_casual_w_worker_PS_m_unw
+# Female outcome: s_casual_w_worker_PS_f_unw
 # ══════════════════════════════════════════════════════════════════════════════
 
 # ── Full SPEI ──────────────────────────────────────────────────────────────────
-spei_full_m <- plm(s_casual_w_lf_PS_m_unw ~ spei_spei12 + spei_spei_lag1 + spei_spei_lag2,
-                   data = pdata_spei, model = "within", effect = "twoways")
+spei_full_m <- plm(s_casual_w_worker_PS_m_unw ~ spei_spei12 + spei_spei_lag1 + spei_spei_lag2,
+                   data = pdata, model = "within", effect = "twoways")
 
-spei_full_f <- plm(s_casual_w_lf_PS_f_unw ~ spei_spei12 + spei_spei_lag1 + spei_spei_lag2,
-                   data = pdata_spei, model = "within", effect = "twoways")
+spei_full_f <- plm(s_casual_w_worker_PS_f_unw ~ spei_spei12 + spei_spei_lag1 + spei_spei_lag2,
+                   data = pdata, model = "within", effect = "twoways")
 
 se_spei_full_m <- cluster_se(spei_full_m)
 se_spei_full_f <- cluster_se(spei_full_f)
@@ -64,11 +43,11 @@ stargazer(
 cat("✓ SPEI Full — gender table saved.\n")
 
 # ── Negative SPEI ─────────────────────────────────────────────────────────────
-spei_neg_m <- plm(s_casual_w_lf_PS_m_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2,
-                  data = pdata_spei, model = "within", effect = "twoways")
+spei_neg_m <- plm(s_casual_w_worker_PS_m_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2,
+                  data = pdata, model = "within", effect = "twoways")
 
-spei_neg_f <- plm(s_casual_w_lf_PS_f_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2,
-                  data = pdata_spei, model = "within", effect = "twoways")
+spei_neg_f <- plm(s_casual_w_worker_PS_f_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2,
+                  data = pdata, model = "within", effect = "twoways")
 
 se_spei_neg_m <- cluster_se(spei_neg_m)
 se_spei_neg_f <- cluster_se(spei_neg_f)
@@ -100,11 +79,11 @@ cat("✓ SPEI Negative — gender table saved.\n")
 # ══════════════════════════════════════════════════════════════════════════════
 
 # ── FI Index ───────────────────────────────────────────────────────────────────
-fi_m <- plm(s_casual_w_lf_PS_m_unw ~ FI_state + FI_lag1 + FI_lag2,
-            data = pdata_flood, model = "within", effect = "twoways")
+fi_m <- plm(s_casual_w_worker_PS_m_unw ~ FI_state + FI_lag1 + FI_lag2,
+            data = pdata_fi, model = "within", effect = "twoways")
 
-fi_f <- plm(s_casual_w_lf_PS_f_unw ~ FI_state + FI_lag1 + FI_lag2,
-            data = pdata_flood, model = "within", effect = "twoways")
+fi_f <- plm(s_casual_w_worker_PS_f_unw ~ FI_state + FI_lag1 + FI_lag2,
+            data = pdata_fi, model = "within", effect = "twoways")
 
 se_fi_m <- cluster_se(fi_m)
 se_fi_f <- cluster_se(fi_f)
@@ -132,11 +111,11 @@ stargazer(
 cat("✓ FI Index — gender table saved.\n")
 
 # ── PR Index ───────────────────────────────────────────────────────────────────
-pr_m <- plm(s_casual_w_lf_PS_m_unw ~ spei_positive + spei_spei_lag1 + spei_spei_lag2,
-            data = pdata_spei, model = "within", effect = "twoways")
+pr_m <- plm(s_casual_w_worker_PS_m_unw ~ spei_positive + spei_spei_lag1 + spei_spei_lag2,
+            data = pdata, model = "within", effect = "twoways")
 
-pr_f <- plm(s_casual_w_lf_PS_f_unw ~ spei_positive + spei_spei_lag1 + spei_spei_lag2,
-            data = pdata_spei, model = "within", effect = "twoways")
+pr_f <- plm(s_casual_w_worker_PS_f_unw ~ spei_positive + spei_spei_lag1 + spei_spei_lag2,
+            data = pdata, model = "within", effect = "twoways")
 
 se_pr_m <- cluster_se(pr_m)
 se_pr_f <- cluster_se(pr_f)
