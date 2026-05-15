@@ -27,11 +27,11 @@ pdata_fi <- pdata.frame(data_flood, index = c("STATE", "year"))
 
 # ── SOME SUMMARY STATISTICS (clean this up somewhere else later) ──────────────
 
-pdata %>%
+data %>%
   dplyr::select(
     "SPEI 12" = spei_spei12, 
-    "SPEI 12 Neg"   = spei_negative, 
-    "SPEI 12 Pos"   = spei_positive,
+    "SPEI 12 Neg" = spei_negative, 
+    "SPEI 12 Pos" = spei_positive,
     "Flood index" = FI_state,
     "Extreme precipitation" = pr_score, 
     "Informality share (/lf)" = s_casual_w_lf_PS_unw,
@@ -42,13 +42,14 @@ pdata %>%
     "Inf.s (urban)" = s_casual_w_worker_PS_urb_unw,
     "State population" = state_pop
   ) %>%
+  dplyr::mutate(across(everything(), as.numeric)) %>%
   datasummary_skim(
     fun_numeric = list(
-      Count = N,
-      Mean   = Mean,
-      SD     = SD,
-      Min    = Min,
-      Max    = Max
+      Count = \(x) sum(!is.na(x)),
+      Mean  = \(x) mean(x, na.rm = TRUE),
+      SD    = \(x) sd(x, na.rm = TRUE),
+      Min   = \(x) min(x, na.rm = TRUE),
+      Max   = \(x) max(x, na.rm = TRUE)
     ),
     fmt = 2,
     output = "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/latex food/petit_summary_workforce.tex"

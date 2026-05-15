@@ -27,7 +27,7 @@ for (g in groups) {
 share_vars <- names(plfs_deep)[grepl("^(lf_share|worker_share|unemp)", names(plfs_deep))]
 my_vars    <- c(share_vars, "pop_tot_unw", "pop_workingage_unw")
 
-plabordata <- pdata.frame(labor_data, index = c("STATE", "year"))
+# plabordata <- pdata.frame(labor_data, index = c("STATE", "year"))
 
 # plabordata |> select(all_of(my_vars)) |> 
 #   datasummary_skim(
@@ -40,7 +40,7 @@ labor_data_flood <- labor_data |>
   filter(STATE != "ARUNACHAL PRADESH") |>
   filter(STATE != "MEGHALAYA")
 
-plabordata_fi <- pdata.frame(labor_data_flood, index = c("STATE", "year"))
+# plabordata_fi <- pdata.frame(labor_data_flood, index = c("STATE", "year"))
 
 
 
@@ -69,11 +69,6 @@ run_spei_neg_block <- function(plabordata, unemp_var, worker_var,
     title            = paste("Effect of Negative SPEI on Labor Market Outcomes –", title_suffix),
     dep.var.labels   = dep_labels,
     covariate.labels = c("Negative SPEI-12", "Neg. SPEI-12 Lag 1", "Neg. SPEI-12 Lag 2"),
-    add.lines = list(
-      c("State FE",             rep("Yes", 2)),
-      c("Year FE",              rep("Yes", 2)),
-      c("Clustered SE (State)", rep("Yes", 2))
-    ),
     omit = c("factor\\(STATE\\)", "factor\\(year\\)", "factor\\(STATE\\):year"),
     omit.stat    = c("f", "ser"),
     notes        = "Working age: 15-64.",
@@ -106,11 +101,6 @@ run_fi_block <- function(plabordata_fi, unemp_var, worker_var,
     title            = paste("Effect of Flood Index on Labor Market Outcomes –", title_suffix),
     dep.var.labels   = dep_labels,
     covariate.labels = c("Flood Index", "Flood Index Lag 1", "Flood Index Lag 2"),
-    add.lines = list(
-      c("State FE",             rep("Yes", 2)),
-      c("Year FE",              rep("Yes", 2)),
-      c("Clustered SE (State)", rep("Yes", 2))
-    ),
     omit = c("factor\\(STATE\\)", "factor\\(year\\)", "factor\\(STATE\\):year"),
     omit.stat    = c("f", "ser"),
     notes        = "Working age: 15-64.",
@@ -127,35 +117,35 @@ run_fi_block <- function(plabordata_fi, unemp_var, worker_var,
 # ══════════════════════════════════════════════════════════════════════════════
 
 # -- 1.0  Aggregate (original) ------------------------------------------------
-run_spei_neg_block(plabordata,
+run_spei_neg_block(labor_data,
                    unemp_var    = "unemp",
                    worker_var   = "worker_share_unw",
                    title_suffix = "Aggregate (PS, Unweighted)",
                    file_suffix  = "aggregate")
 
 # -- 1.1  Male ----------------------------------------------------------------
-run_spei_neg_block(plabordata,
+run_spei_neg_block(labor_data,
                    unemp_var    = "unemp_m",
                    worker_var   = "worker_share_m_unw",
                    title_suffix = "Male (PS, Unweighted)",
                    file_suffix  = "male")
 
 # -- 1.2  Female --------------------------------------------------------------
-run_spei_neg_block(plabordata,
+run_spei_neg_block(labor_data,
                    unemp_var    = "unemp_f",
                    worker_var   = "worker_share_f_unw",
                    title_suffix = "Female (PS, Unweighted)",
                    file_suffix  = "female")
 
 # -- 1.3  Rural ---------------------------------------------------------------
-run_spei_neg_block(plabordata,
+run_spei_neg_block(labor_data,
                    unemp_var    = "unemp_rur",
                    worker_var   = "worker_share_rur_unw",
                    title_suffix = "Rural (PS, Unweighted)",
                    file_suffix  = "rural")
 
 # -- 1.4  Urban ---------------------------------------------------------------
-run_spei_neg_block(plabordata,
+run_spei_neg_block(labor_data,
                    unemp_var    = "unemp_urb",
                    worker_var   = "worker_share_urb_unw",
                    title_suffix = "Urban (PS, Unweighted)",
@@ -166,35 +156,35 @@ run_spei_neg_block(plabordata,
 # ══════════════════════════════════════════════════════════════════════════════
 
 # -- 2.0  Aggregate (original) ------------------------------------------------
-run_fi_block(plabordata_fi,
+run_fi_block(labor_data_flood,
              unemp_var    = "unemp",
              worker_var   = "worker_share_unw",
              title_suffix = "Aggregate (PS, Unweighted)",
              file_suffix  = "aggregate")
 
 # -- 2.1  Male ----------------------------------------------------------------
-run_fi_block(plabordata_fi,
+run_fi_block(labor_data_flood,
              unemp_var    = "unemp_m",
              worker_var   = "worker_share_m_unw",
              title_suffix = "Male (PS, Unweighted)",
              file_suffix  = "male")
 
 # -- 2.2  Female --------------------------------------------------------------
-run_fi_block(plabordata_fi,
+run_fi_block(labor_data_flood,
              unemp_var    = "unemp_f",
              worker_var   = "worker_share_f_unw",
              title_suffix = "Female (PS, Unweighted)",
              file_suffix  = "female")
 
 # -- 2.3  Rural ---------------------------------------------------------------
-run_fi_block(plabordata_fi,
+run_fi_block(labor_data_flood,
              unemp_var    = "unemp_rur",
              worker_var   = "worker_share_rur_unw",
              title_suffix = "Rural (PS, Unweighted)",
              file_suffix  = "rural")
 
 # -- 2.4  Urban ---------------------------------------------------------------
-run_fi_block(plabordata_fi,
+run_fi_block(labor_data_flood,
              unemp_var    = "unemp_urb",
              worker_var   = "worker_share_urb_unw",
              title_suffix = "Urban (PS, Unweighted)",
