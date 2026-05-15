@@ -8,33 +8,37 @@
 # test the following flood indices: the FI index (excluding the 2 states taht don't have indices), and the pr index (all states but LAKSHADWEEP, as usual)
 # both with 2 lags
 
-out <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/latex food/FLOOD"
+out <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/regressions/weighted_workers"
 dir.create(out, recursive = TRUE, showWarnings = FALSE)
 
 # ── Informality measure ───────────────────────────────────────────────────────
-# s_casual_w_worker_PS_unw  (PS = principal + subsidiary status, unweighted)
+# s_casual_w_worker_PS_unw  (PS = principal + subsidiary status, weighted)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TABLE 1 – FI Index with 2 lags (restricted sample: excl. ARUNACHAL & MEGHALAYA)
 # ══════════════════════════════════════════════════════════════════════════════
 
 # Spec 1a: contemporaneous only
-m1a <- plm(s_casual_w_worker_PS_unw ~ FI_state,
-           data   = pdata_fi,
-           model  = "within",
-           effect = "twoways")
+m1a <- lm(s_casual_w_worker_PS_unw ~ FI_state +
+          factor(STATE) + factor(year) + factor(STATE):year,
+          data = data_flood
+          , weights = state_pop
+) 
 
 # Spec 1b: + lag 1
-m1b <- plm(s_casual_w_worker_PS_unw ~ FI_state + FI_lag1,
-           data   = pdata_fi,
-           model  = "within",
-           effect = "twoways")
+m1b <- lm(s_casual_w_worker_PS_unw ~ FI_state + FI_lag1 +
+            factor(STATE) + factor(year) + factor(STATE):year,
+          data = data_flood
+          , weights = state_pop
+) 
+
 
 # Spec 1c: + lag 1 & lag 2  (optimal)
-m1c <- plm(s_casual_w_worker_PS_unw ~ FI_state + FI_lag1 + FI_lag2,
-           data   = pdata_fi,
-           model  = "within",
-           effect = "twoways")
+m1c <- lm(s_casual_w_worker_PS_unw ~ FI_state + FI_lag1 + FI_lag2+
+            factor(STATE) + factor(year) + factor(STATE):year,
+          data = data_flood
+          , weights = state_pop
+) 
 
 se1a <- cluster_se(m1a)
 se1b <- cluster_se(m1b)
@@ -44,18 +48,16 @@ stargazer(
   m1a, m1b, m1c,
   se        = list(se1a[, 2], se1b[, 2], se1c[, 2]),
   p         = list(se1a[, 4], se1b[, 4], se1c[, 4]),
-  title     = "Effect of Flood Index (FI) on Casual Labour-Force Participation (PS, Unweighted)",
+  title     = "Effect of Flood Index (FI) on Casual Labour-Force Participation (PS, weighted)",
   dep.var.labels   = "Share Casual Workers (PS, Unw.)",
   covariate.labels = c("Flood Index", "Flood Index Lag 1", "Flood Index Lag 2"),
-  # column.labels    = c("Contemp.", "+ Lag 1", "+ Lag 1\\&2"),
-  add.lines = list(
-    c("State FE",              "Yes", "Yes", "Yes"),
-    c("Year FE",               "Yes", "Yes", "Yes"),
-    c("Clustered SE (State)",  "Yes", "Yes", "Yes")),
+  omit = c("factor\\(STATE\\)",
+           "factor\\(year\\)",
+           "factor\\(STATE\\):year"),
   omit.stat    = c("f", "ser"),
   notes        = "Clustered standard errors at the state level in parentheses. Sample excludes LAKSHADWEEP, ARUNACHAL PRADESH, and MEGHALAYA due to missing flood index data.",
   notes.append = FALSE,
-  out          = file.path(out, "table1_FI_index_workers.tex"),
+  out          = file.path(out, "FLOOD_FI_index_workers.tex"),
   type         = "latex",
   label        = "tab:fi_index"
 )
@@ -67,22 +69,25 @@ cat("✓ Table 1 (FI Index) saved.\n")
 # ══════════════════════════════════════════════════════════════════════════════
 
 # Spec 2a: contemporaneous only
-m2a <- plm(s_casual_w_worker_PS_unw ~ pr_score,
-           data   = pdata,
-           model  = "within",
-           effect = "twoways")
+m2a <- lm(s_casual_w_worker_PS_unw ~ pr_score+
+            factor(STATE) + factor(year) + factor(STATE):year,
+          data = data
+          , weights = state_pop
+) 
 
 # Spec 2b: + lag 1
-m2b <- plm(s_casual_w_worker_PS_unw ~ pr_score + pr_lag1,
-           data   = pdata,
-           model  = "within",
-           effect = "twoways")
+m2b <- lm(s_casual_w_worker_PS_unw ~ pr_score + pr_lag1 +
+            factor(STATE) + factor(year) + factor(STATE):year,
+          data = data
+          , weights = state_pop
+) 
 
 # Spec 2c: + lag 1 & lag 2  (optimal)
-m2c <- plm(s_casual_w_worker_PS_unw ~  pr_score + pr_lag1 + pr_lag2,
-           data   = pdata,
-           model  = "within",
-           effect = "twoways")
+m2c <- lm(s_casual_w_worker_PS_unw ~  pr_score + pr_lag1 + pr_lag2 +
+            factor(STATE) + factor(year) + factor(STATE):year,
+          data = data
+          , weights = state_pop
+) 
 
 se2a <- cluster_se(m2a)
 se2b <- cluster_se(m2b)
@@ -92,20 +97,16 @@ stargazer(
   m2a, m2b, m2c,
   se        = list(se2a[, 2], se2b[, 2], se2c[, 2]),
   p         = list(se2a[, 4], se2b[, 4], se2c[, 4]),
-  title     = "Effect of Positive Precipitation Index (PR) on Casual Labour-Force Participation (PS, Unweighted)",
+  title     = "Effect of Positive Precipitation Index (PR) on Casual Labour-Force Participation (PS, weighted)",
   dep.var.labels   = "Share Casual Workers (PS, Unw.)",
   covariate.labels = c("PR Index", "PR Index Lag 1", "PR Index Lag 2"),
-  # column.labels    = c("Contemp.", "+ Lag 1", "+ Lag 1\\&2"),
-  add.lines = list(
-    c("State FE",              "Yes", "Yes", "Yes"),
-    c("Year FE",               "Yes", "Yes", "Yes"),
-    c("Clustered SE (State)",  "Yes", "Yes", "Yes")
-    #c("Sample",                "Full", "Full", "Full")
-  ),
+  omit = c("factor\\(STATE\\)",
+           "factor\\(year\\)",
+           "factor\\(STATE\\):year"),
   omit.stat    = c("f", "ser"),
   notes        = "Clustered standard errors at the state level in parentheses. Sample excludes LAKSHADWEEP only. PR index captures positive SPEI (excess precipitation) episodes.",
   notes.append = FALSE,
-  out          = file.path(out, "table2_PR_index_workers.tex"),
+  out          = file.path(out, "FLOOD_PR_index_workers.tex"),
   type         = "latex",
   label        = "tab:pr_index"
 )
@@ -126,17 +127,13 @@ stargazer(
     "Flood Index",     "Flood Index Lag 1", "Flood Index Lag 2",
     "PR Index",        "PR Index Lag 1",    "PR Index Lag 2"
   ),
-  # column.labels = c("FI Index", "PR Index"),
-  add.lines = list(
-    c("State FE",              "Yes", "Yes"),
-    c("Year FE",               "Yes", "Yes"),
-    c("Clustered SE (State)",  "Yes", "Yes")
-    #c("Sample",                "Restricted", "Full")
-  ),
+  omit = c("factor\\(STATE\\)",
+           "factor\\(year\\)",
+           "factor\\(STATE\\):year"),
   omit.stat    = c("f", "ser"),
   notes        = "Clustered standard errors at the state level in parentheses. FI column excludes ARUNACHAL PRADESH and MEGHALAYA due to missing data; PR column uses full sample (excl. LAKSHADWEEP).",
   notes.append = FALSE,
-  out          = file.path(out, "table3_FI_vs_PR_workers.tex"),
+  out          = file.path(out, "FLOOD_FI_vs_PR_workers.tex"),
   type         = "latex",
   label        = "tab:fi_vs_pr"
 )

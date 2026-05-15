@@ -1,3 +1,8 @@
+# what is the effect of the shocks on labor force participation (lf/pop), employment (workers/lf), unemployment
+
+out <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/regressions/labor_market"
+dir.create(out, recursive = TRUE, showWarnings = FALSE)
+
 # ── SOME SUMMARY STATISTICS (clean this up somewhere else later) ──────────────
 
 plfs_deep <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe_deeper.csv") |> 
@@ -24,51 +29,52 @@ my_vars    <- c(share_vars, "pop_tot_unw", "pop_workingage_unw")
 
 plabordata <- pdata.frame(labor_data, index = c("STATE", "year"))
 
-plabordata |> select(all_of(my_vars)) |> 
-  datasummary_skim(
-    fun_numeric = list(Count = N, Mean = Mean, SD = SD, Min = Min, Max = Max),
-    fmt    = 2,
-    output = "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/latex food/labormarket_summary.tex"
-  )
+# plabordata |> select(all_of(my_vars)) |> 
+#   datasummary_skim(
+#     fun_numeric = list(Count = N, Mean = Mean, SD = SD, Min = Min, Max = Max),
+#     fmt    = 2,
+#     output = "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/latex food/labormarket_summary.tex"
+#   )
+
+labor_data_flood <- labor_data |>
+  filter(STATE != "ARUNACHAL PRADESH") |>
+  filter(STATE != "MEGHALAYA")
+
+plabordata_fi <- pdata.frame(labor_data_flood, index = c("STATE", "year"))
+
+
 
 # ══════════════════════════════════════════════════════════════════════════════
-# HELPER: run a 6-model block (unemp + worker_share, 3 lag specs) and save
+# HELPER: run a 2-model block (unemp + worker_share) and save
 # ══════════════════════════════════════════════════════════════════════════════
 
-run_spei_neg_block <- function(pdata, unemp_var, worker_var,
+run_spei_neg_block <- function(plabordata, unemp_var, worker_var,
                                title_suffix, file_suffix,
                                dep_labels = c("Unemployment", "Employment")) {
   
-  f_unemp  <- as.formula(paste0(unemp_var,  " ~ spei_negative"))
-  f_unemp1 <- as.formula(paste0(unemp_var,  " ~ spei_negative + spei_neg_spei_lag1"))
-  f_unemp2 <- as.formula(paste0(unemp_var,  " ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2"))
+  f_unemp  <- as.formula(paste0(unemp_var,  " ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 + factor(STATE) + factor(year) + factor(STATE):year"))
   
-  f_work   <- as.formula(paste0(worker_var, " ~ spei_negative"))
-  f_work1  <- as.formula(paste0(worker_var, " ~ spei_negative + spei_neg_spei_lag1"))
-  f_work2  <- as.formula(paste0(worker_var, " ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2"))
+  f_work   <- as.formula(paste0(worker_var, " ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 + factor(STATE) + factor(year) + factor(STATE):year"))
   
-  ma <- plm(f_unemp,  data = pdata, model = "within", effect = "twoways")
-  mb <- plm(f_unemp1, data = pdata, model = "within", effect = "twoways")
-  mc <- plm(f_unemp2, data = pdata, model = "within", effect = "twoways")
-  md <- plm(f_work,   data = pdata, model = "within", effect = "twoways")
-  me <- plm(f_work1,  data = pdata, model = "within", effect = "twoways")
-  mf <- plm(f_work2,  data = pdata, model = "within", effect = "twoways")
-  
-  sea <- cluster_se(ma); seb <- cluster_se(mb); sec <- cluster_se(mc)
-  sed <- cluster_se(md); see <- cluster_se(me); sef <- cluster_se(mf)
+  ma <- lm(f_unemp,  data = plabordata)
+  md <- lm(f_work,   data = plabordata)
+
+  sea <- cluster_se(ma)
+  sed <- cluster_se(md)
   
   stargazer(
-    ma, mb, mc, md, me, mf,
-    se = list(sea[,2], seb[,2], sec[,2], sed[,2], see[,2], sef[,2]),
-    p  = list(sea[,4], seb[,4], sec[,4], sed[,4], see[,4], sef[,4]),
+    ma, md,
+    se = list(sea[,2], sed[,2]),
+    p  = list(sea[,4], sed[,4]),
     title            = paste("Effect of Negative SPEI on Labor Market Outcomes –", title_suffix),
     dep.var.labels   = dep_labels,
     covariate.labels = c("Negative SPEI-12", "Neg. SPEI-12 Lag 1", "Neg. SPEI-12 Lag 2"),
     add.lines = list(
-      c("State FE",             rep("Yes", 6)),
-      c("Year FE",              rep("Yes", 6)),
-      c("Clustered SE (State)", rep("Yes", 6))
+      c("State FE",             rep("Yes", 2)),
+      c("Year FE",              rep("Yes", 2)),
+      c("Clustered SE (State)", rep("Yes", 2))
     ),
+    omit = c("factor\\(STATE\\)", "factor\\(year\\)", "factor\\(STATE\\):year"),
     omit.stat    = c("f", "ser"),
     notes        = "Working age: 15-64.",
     notes.append = FALSE,
@@ -79,40 +85,33 @@ run_spei_neg_block <- function(pdata, unemp_var, worker_var,
   cat("✓ Neg SPEI table saved:", file_suffix, "\n")
 }
 
-run_fi_block <- function(pdata, unemp_var, worker_var,
+run_fi_block <- function(plabordata_fi, unemp_var, worker_var,
                          title_suffix, file_suffix,
                          dep_labels = c("Unemployment", "Employment")) {
   
-  f_unemp  <- as.formula(paste0(unemp_var,  " ~ FI_state"))
-  f_unemp1 <- as.formula(paste0(unemp_var,  " ~ FI_state + FI_lag1"))
-  f_unemp2 <- as.formula(paste0(unemp_var,  " ~ FI_state + FI_lag1 + FI_lag2"))
+  f_unemp  <- as.formula(paste0(unemp_var,  " ~ FI_state + FI_lag1 + FI_lag2 + factor(STATE) + factor(year) + factor(STATE):year"))
   
-  f_work   <- as.formula(paste0(worker_var, " ~ FI_state"))
-  f_work1  <- as.formula(paste0(worker_var, " ~ FI_state + FI_lag1"))
-  f_work2  <- as.formula(paste0(worker_var, " ~ FI_state + FI_lag1 + FI_lag2"))
+  f_work   <- as.formula(paste0(worker_var, " ~ FI_state + FI_lag1 + FI_lag2 + factor(STATE) + factor(year) + factor(STATE):year"))
   
-  ma <- plm(f_unemp,  data = pdata, model = "within", effect = "twoways")
-  mb <- plm(f_unemp1, data = pdata, model = "within", effect = "twoways")
-  mc <- plm(f_unemp2, data = pdata, model = "within", effect = "twoways")
-  md <- plm(f_work,   data = pdata, model = "within", effect = "twoways")
-  me <- plm(f_work1,  data = pdata, model = "within", effect = "twoways")
-  mf <- plm(f_work2,  data = pdata, model = "within", effect = "twoways")
-  
-  sea <- cluster_se(ma); seb <- cluster_se(mb); sec <- cluster_se(mc)
-  sed <- cluster_se(md); see <- cluster_se(me); sef <- cluster_se(mf)
+  ma <- plm(f_unemp,  data = plabordata_fi)
+  md <- plm(f_work,   data = plabordata_fi)
+
+  sea <- cluster_se(ma)
+  sed <- cluster_se(md)
   
   stargazer(
-    ma, mb, mc, md, me, mf,
-    se = list(sea[,2], seb[,2], sec[,2], sed[,2], see[,2], sef[,2]),
-    p  = list(sea[,4], seb[,4], sec[,4], sed[,4], see[,4], sef[,4]),
+    ma, md,
+    se = list(sea[,2], sed[,2]),
+    p  = list(sea[,4], sed[,4]),
     title            = paste("Effect of Flood Index on Labor Market Outcomes –", title_suffix),
     dep.var.labels   = dep_labels,
     covariate.labels = c("Flood Index", "Flood Index Lag 1", "Flood Index Lag 2"),
     add.lines = list(
-      c("State FE",             rep("Yes", 6)),
-      c("Year FE",              rep("Yes", 6)),
-      c("Clustered SE (State)", rep("Yes", 6))
+      c("State FE",             rep("Yes", 2)),
+      c("Year FE",              rep("Yes", 2)),
+      c("Clustered SE (State)", rep("Yes", 2))
     ),
+    omit = c("factor\\(STATE\\)", "factor\\(year\\)", "factor\\(STATE\\):year"),
     omit.stat    = c("f", "ser"),
     notes        = "Working age: 15-64.",
     notes.append = FALSE,
@@ -165,12 +164,6 @@ run_spei_neg_block(plabordata,
 # ══════════════════════════════════════════════════════════════════════════════
 # TABLE BLOCK 2 – Flood Index | All subgroups
 # ══════════════════════════════════════════════════════════════════════════════
-
-labor_data_flood <- labor_data |>
-  filter(STATE != "ARUNACHAL PRADESH") |>
-  filter(STATE != "MEGHALAYA")
-
-plabordata_fi <- pdata.frame(labor_data_flood, index = c("STATE", "year"))
 
 # -- 2.0  Aggregate (original) ------------------------------------------------
 run_fi_block(plabordata_fi,

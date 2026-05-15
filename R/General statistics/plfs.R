@@ -1,7 +1,7 @@
 library(tidyverse)
 library(dplyr)
 
-plfs_deep <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/My data prep/PLFS processed/deep-PLFS_all_s_N_unw.csv')
+plfs_deep <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/My data prep/PLFS processed/deeper-PLFS_all_s_N_unw.csv')
 
 # ── 1. Check structure ────────────────────────────────────────────────────────
 glimpse(plfs_deep)
@@ -86,21 +86,26 @@ for (var in share_vars) {
 plfs_india <- plfs_deep |>
   group_by(time) |>
   summarise(
-    lf_share_unw         = weighted.mean(lf_share_unw,         pop_tot_unw, na.rm = TRUE),
+    lf_share_unw         = weighted.mean(lf_share_unw,         pop_workingage_unw, na.rm = TRUE),
     lf_share_m_unw       = weighted.mean(lf_share_m_unw,       pop_m_unw,   na.rm = TRUE),
     lf_share_f_unw       = weighted.mean(lf_share_f_unw,       pop_f_unw,   na.rm = TRUE),
     lf_share_urb_unw     = weighted.mean(lf_share_urb_unw,     pop_urb_unw, na.rm = TRUE),
     lf_share_rur_unw     = weighted.mean(lf_share_rur_unw,     pop_rur_unw, na.rm = TRUE),
-    worker_share_unw     = weighted.mean(worker_share_unw,     pop_tot_unw, na.rm = TRUE),
+    worker_share_unw     = weighted.mean(worker_share_unw,     pop_workingage_unw, na.rm = TRUE),
     worker_share_m_unw   = weighted.mean(worker_share_m_unw,   pop_m_unw,   na.rm = TRUE),
     worker_share_f_unw   = weighted.mean(worker_share_f_unw,   pop_f_unw,   na.rm = TRUE),
     worker_share_urb_unw = weighted.mean(worker_share_urb_unw, pop_urb_unw, na.rm = TRUE),
     worker_share_rur_unw = weighted.mean(worker_share_rur_unw, pop_rur_unw, na.rm = TRUE),
-     s_casual_w_lf_PS_unw     = weighted.mean(s_casual_w_lf_PS_unw,     pop_tot_unw, na.rm = TRUE),
+     s_casual_w_lf_PS_unw     = weighted.mean(s_casual_w_lf_PS_unw,     pop_workingage_unw, na.rm = TRUE),
      s_casual_w_lf_PS_m_unw   = weighted.mean(s_casual_w_lf_PS_m_unw,   pop_m_unw,   na.rm = TRUE),
      s_casual_w_lf_PS_f_unw   = weighted.mean(s_casual_w_lf_PS_f_unw,   pop_f_unw,   na.rm = TRUE),
      s_casual_w_lf_PS_urb_unw = weighted.mean(s_casual_w_lf_PS_urb_unw, pop_urb_unw, na.rm = TRUE),
      s_casual_w_lf_PS_rur_unw = weighted.mean(s_casual_w_lf_PS_rur_unw, pop_rur_unw, na.rm = TRUE),
+    s_casual_w_worker_PS_unw     = weighted.mean(s_casual_w_worker_PS_unw,     worker_PS_unw, na.rm = TRUE),
+    s_casual_w_worker_PS_m_unw   = weighted.mean(s_casual_w_worker_PS_m_unw,   worker_PS_m_unw,   na.rm = TRUE),
+    s_casual_w_worker_PS_f_unw   = weighted.mean(s_casual_w_worker_PS_f_unw,   worker_PS_f_unw,   na.rm = TRUE),
+    s_casual_w_worker_PS_urb_unw = weighted.mean(s_casual_w_worker_PS_urb_unw, worker_PS_urb_unw, na.rm = TRUE),
+    s_casual_w_worker_PS_rur_unw = weighted.mean(s_casual_w_worker_PS_rur_unw, worker_PS_rur_unw, na.rm = TRUE),
     .groups = "drop"
   )
 
@@ -115,7 +120,7 @@ plfs_india |>
     names_to  = "variable",
     values_to = "value"
   ) |>
-  mutate(variable = recode(variable,
+  mutate(variable = dplyr::recode(variable,
                            "lf_share_unw"     = "Overall",
                            "lf_share_m_unw"   = "Male",
                            "lf_share_f_unw"   = "Female",
@@ -148,7 +153,7 @@ plfs_india |>
     names_to  = "variable",
     values_to = "value"
   ) |>
-  mutate(variable = recode(variable,
+  mutate(variable = dplyr::recode(variable,
                            "worker_share_unw"     = "Overall",
                            "worker_share_m_unw"   = "Male",
                            "worker_share_f_unw"   = "Female",
@@ -177,16 +182,16 @@ plfs_india |>
 # -- Informality shares (5 lines) --------------------------------------------------
 plfs_india |>
   pivot_longer(
-    cols      = starts_with("s_casual_w_lf_PS"),
+    cols      = starts_with("s_casual_w_worker_PS"),
     names_to  = "variable",
     values_to = "value"
   ) |>
-  mutate(variable = recode(variable,
-                           "s_casual_w_lf_PS_unw"     = "Overall",
-                           "s_casual_w_lf_PS_m_unw"   = "Male",
-                           "s_casual_w_lf_PS_f_unw"   = "Female",
-                           "s_casual_w_lf_PS_urb_unw" = "Urban",
-                           "s_casual_w_lf_PS_rur_unw" = "Rural"
+  mutate(variable = dplyr::recode(variable,
+                           "s_casual_w_worker_PS_unw"     = "Overall",
+                           "s_casual_w_worker_PS_m_unw"   = "Male",
+                           "s_casual_w_worker_PS_f_unw"   = "Female",
+                           "s_casual_w_worker_PS_urb_unw" = "Urban",
+                           "s_casual_w_worker_PS_rur_unw" = "Rural"
   )) |>
   ggplot(aes(x = time, y = value, color = variable, group = variable)) +
   geom_line(linewidth = 1) +
@@ -199,10 +204,11 @@ plfs_india |>
     "Rural"   = "forestgreen"
   )) +
   labs(
-    title = "Informality — India (population weighted)",
+    title = "Informality — India (working-population-weighted)",
     x     = "Year",
-    y     = "Informality/LF",
+    y     = "Informality/workers",
     color = NULL
   ) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+

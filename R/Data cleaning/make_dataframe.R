@@ -9,7 +9,7 @@ library(stringr)
 flood_index <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/state_flood_index.csv")
 spei_index <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/spei_with_lags.csv")
 population <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/state_population.csv")
-plfs_data <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/plfs/new-PLFS_all_s_N_unw.csv')
+#plfs_data <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/plfs/new-PLFS_all_s_N_unw.csv')
 extreme_events <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/combined_states_scores_new.csv") |> 
   filter(custom_year >= 2013)
 

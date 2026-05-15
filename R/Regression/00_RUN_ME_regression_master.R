@@ -58,3 +58,22 @@ pdata %>%
 cluster_se <- function(model) {
   coeftest(model, vcov = vcovHC(model, type = "HC1", cluster = "group"))
 }
+
+
+# -- MOVING FROM PLM TO LM ----------
+# TODO: explicit the factors and chage the data
+# # Spec 1a: contemporaneous only
+# # OLD STRATEGY
+# m1a <- plm(s_casual_w_worker_PS_unw ~ spei_spei12,
+#            data   = pdata,
+#            model  = "within",
+#            effect = "twoways")
+# 
+# #NEW STRATEGY
+# m1a <- lm(s_casual_w_worker_PS_unw ~ spei_spei12 +
+#             factor(STATE) + factor(year) + factor(STATE):year,
+#           data = data)
+# 
+# # both yield the same estimate!! The R^2s just mean different things
+# 
+# summary(m1a)
