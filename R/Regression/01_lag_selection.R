@@ -18,14 +18,14 @@ extract_aic_plm <- function(model) {
   return(c(AIC = aic, BIC = bic))
 }
 
-optimal_lags_spei <- data.frame(Lags = 1:3, AIC = NA, BIC = NA)
-optimal_lags_flood <- data.frame(Lags = 1:3, AIC = NA, BIC = NA)
-optimal_lags_pr <- data.frame(Lags = 1:3, AIC = NA, BIC = NA)
+optimal_lags_spei <- data.frame(Lags = 1:4, AIC = NA, BIC = NA)
+optimal_lags_flood <- data.frame(Lags = 1:4, AIC = NA, BIC = NA)
+optimal_lags_pr <- data.frame(Lags = 1:4, AIC = NA, BIC = NA)
 
 
 for (i in 1:3) {
   lags_to_include <- paste0("spei_neg_spei_lag", 1:i)
-  formula_str <- paste("s_casual_w_worker_PS_unw ~ spei_negative +", paste(lags_to_include, collapse = " + "))
+  formula_str <- paste("s_casual_w_worker_W_unw ~ ", paste(lags_to_include, collapse = " + "))
   
   # Run Fixed Effects (within) model
   fit <- plm(as.formula(formula_str), data = pdata, model = "within")
@@ -35,10 +35,16 @@ for (i in 1:3) {
   optimal_lags_spei$AIC[i] <- metrics["AIC"]
   optimal_lags_spei$BIC[i] <- metrics["BIC"]
 }
+#test with current year to compare
+formula_str <- "s_casual_w_worker_W_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 + spei_neg_spei_lag3"
+fit <- plm(as.formula(formula_str), data = pdata, model = "within")
+metrics <- extract_aic_plm(fit)
+optimal_lags_spei$AIC[4] <- metrics["AIC"]
+optimal_lags_spei$BIC[4] <- metrics["BIC"]
 
 for (i in 1:3) {
   lags_to_include <- paste0("FI_lag", 1:i)
-  formula_str <- paste("s_casual_w_worker_PS_unw ~ FI_state +", paste(lags_to_include, collapse = " + "))
+  formula_str <- paste("s_casual_w_worker_W_unw ~ ", paste(lags_to_include, collapse = " + "))
   
   # Run Fixed Effects (within) model
   fit <- plm(as.formula(formula_str), data = pdata_fi, model = "within")
@@ -48,10 +54,16 @@ for (i in 1:3) {
   optimal_lags_flood$AIC[i] <- metrics["AIC"]
   optimal_lags_flood$BIC[i] <- metrics["BIC"]
 }
+#test with current year to compare
+formula_str <- "s_casual_w_worker_W_unw ~ FI_state + FI_lag1 + FI_lag2"
+fit <- plm(as.formula(formula_str), data = pdata, model = "within")
+metrics <- extract_aic_plm(fit)
+optimal_lags_flood$AIC[4] <- metrics["AIC"]
+optimal_lags_flood$BIC[4] <- metrics["BIC"]
 
 for (i in 1:3) {
   lags_to_include <- paste0("pr_lag", 1:i)
-  formula_str <- paste("s_casual_w_worker_PS_unw ~ pr_score +", paste(lags_to_include, collapse = " + "))
+  formula_str <- paste("s_casual_w_worker_W_unw ~ ", paste(lags_to_include, collapse = " + "))
   
   # Run Fixed Effects (within) model
   fit <- plm(as.formula(formula_str), data = pdata, model = "within")
@@ -61,6 +73,12 @@ for (i in 1:3) {
   optimal_lags_pr$AIC[i] <- metrics["AIC"]
   optimal_lags_pr$BIC[i] <- metrics["BIC"]
 }
+#test with current year to compare
+formula_str <- "s_casual_w_worker_W_unw ~ pr_score + pr_lag1"
+fit <- plm(as.formula(formula_str), data = pdata, model = "within")
+metrics <- extract_aic_plm(fit)
+optimal_lags_pr$AIC[4] <- metrics["AIC"]
+optimal_lags_pr$BIC[4] <- metrics["BIC"]
 
 print(optimal_lags_spei)
 print(optimal_lags_flood)

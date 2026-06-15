@@ -62,6 +62,23 @@ stargazer(
   label        = "tab:fi_index"
 )
 
+stargazer(
+  m1a, m1b, m1c,
+  se        = list(se1a[, 2], se1b[, 2], se1c[, 2]),
+  p         = list(se1a[, 4], se1b[, 4], se1c[, 4]),
+  title     = "Effect of Flood Index (FI) on Casual Labour-Force Participation (PS, weighted)",
+  dep.var.labels   = "Share Casual Workers (PS, Unw.)",
+  covariate.labels = c("Flood Index", "Flood Index Lag 1", "Flood Index Lag 2"),
+  omit = c("factor\\(STATE\\)",
+           "factor\\(year\\)",
+           "factor\\(STATE\\):year"),
+  omit.stat    = c("f", "ser"),
+  #notes        = "Clustered standard errors at the state level in parentheses. Sample excludes LAKSHADWEEP, ARUNACHAL PRADESH, and MEGHALAYA due to missing flood index data.",
+  notes.append = FALSE,
+  type         = "text",
+  label        = "tab:fi_index"
+)
+
 cat("✓ Table 1 (FI Index) saved.\n")
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -104,10 +121,10 @@ stargazer(
            "factor\\(year\\)",
            "factor\\(STATE\\):year"),
   omit.stat    = c("f", "ser"),
-  notes        = "Clustered standard errors at the state level in parentheses. Sample excludes LAKSHADWEEP only. PR index captures positive SPEI (excess precipitation) episodes.",
+  #notes        = "Clustered standard errors at the state level in parentheses. Sample excludes LAKSHADWEEP only. PR index captures positive SPEI (excess precipitation) episodes.",
   notes.append = FALSE,
-  out          = file.path(out, "FLOOD_PR_index_workers.tex"),
-  type         = "latex",
+  #out          = file.path(out, "FLOOD_PR_index_workers.tex"),
+  type         = "text",
   label        = "tab:pr_index"
 )
 
@@ -135,6 +152,27 @@ stargazer(
   notes.append = FALSE,
   out          = file.path(out, "FLOOD_FI_vs_PR_workers.tex"),
   type         = "latex",
+  label        = "tab:fi_vs_pr"
+)
+
+stargazer(
+  m1c, m2b,
+  se        = list(se1c[, 2], se2c[, 2]),
+  p         = list(se1c[, 4], se2c[, 4]),
+  title     = "Flood Index vs. PR Index: Optimal Lag Specification",
+  dep.var.labels   = "Share Casual Workers (PS, Unw.)",
+  covariate.labels = c(
+    "Flood Index",     "Flood Index Lag 1", "Flood Index Lag 2",
+    "PR Index",        "PR Index Lag 1",    "PR Index Lag 2"
+  ),
+  omit = c("factor\\(STATE\\)",
+           "factor\\(year\\)",
+           "factor\\(STATE\\):year",
+           "Constant"),
+  omit.stat    = c("f", "ser"),
+  notes        = "Includes state-specific trends. Population weghted.",
+  notes.append = FALSE,
+  type         = "text",
   label        = "tab:fi_vs_pr"
 )
 

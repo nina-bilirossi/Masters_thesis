@@ -10,11 +10,12 @@ flood_index <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code
 spei_index <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/spei_with_lags.csv")
 population <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/state_population.csv")
 #plfs_data <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/plfs/new-PLFS_all_s_N_unw.csv')
-extreme_events <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/combined_states_scores_new.csv") |> 
+extreme_events <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/python results/combined_states_scores_new.csv") |> 
   filter(custom_year >= 2013)
 
 # plfs_deeper <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/My data prep/PLFS processed/deeper-PLFS_all_s_N_unw.csv')
-# plfs_data <- plfs_deeper
+plfs_weekly <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/My data prep/PLFS processed/weekly-PLFS_all_s_N_unw.csv')
+plfs_data <- plfs_weekly
 
 length(unique(flood_index$STATE_UT)) # 35 states/UTs
 length(unique(extreme_events$STATE_UT))
@@ -37,21 +38,18 @@ unmatched_states1
 unmatched_states2
 
 plfs_data <- plfs_data %>%
-  mutate(state_name = recode(state_name,
-                             "JAMMU & KASHMIR" = "JAMMU AND KASHMIR",
-                             "UTTARANCHAL" = "UTTARAKHAND",
-                             #"DEHLI" = "DELHI",
-                             "ORISSA" = "ODISHA",
-                             "CHATTISGARH" = "CHHATTISGARH",
-                             "LAKSHDWEEP" = "LAKSHADWEEP",
-                             "PONDICHERRY"= "PUDUCHERRY",
-                             "A & N ISLANDS" = "ANDAMAN & NICOBAR",
-                             #"ANDAMAN AND NICOBAR" = "ANDAMAN & NICOBAR", # why is it there twice?
-                             "D & N. HAVELI & DAMAN & DIU" = "DADRA & NAGAR HAVELI & DAMAN & DIU",
-                             #"DADRA & NAGAR HAVELI" = "DADRA & NAGAR HAVELI & DAMAN & DIU",
-                             #"DAMAN & DIU" = "DADRA & NAGAR HAVELI & DAMAN & DIU"
+  mutate(state_name = case_match(
+    state_name,
+    "JAMMU & KASHMIR" ~ "JAMMU AND KASHMIR",
+    "UTTARANCHAL"     ~ "UTTARAKHAND",
+    "ORISSA"          ~ "ODISHA",
+    "CHATTISGARH"     ~ "CHHATTISGARH",
+    "LAKSHDWEEP"      ~ "LAKSHADWEEP",
+    "PONDICHERRY"     ~ "PUDUCHERRY",
+    "A & N ISLANDS"   ~ "ANDAMAN & NICOBAR",
+    "D & N. HAVELI & DAMAN & DIU" ~ "DADRA & NAGAR HAVELI & DAMAN & DIU",
+    .default = state_name # This keeps everything else exactly as it was
   ))
-
 
 # alles guet
 
@@ -66,7 +64,7 @@ flood_index_lags <- flood_index |>
   ) |> 
   ungroup() |> 
   filter(hydro_year >= 2014) |>  # keep only years since 2014 (since PLFS data starts in 2017, and we want to keep 3 lags)
-  mutate(STATE_UT = recode(STATE_UT, "ANDAMAN AND NICOBAR ISLANDS" = "ANDAMAN & NICOBAR"))
+  mutate(STATE_UT = case_match(STATE_UT, "ANDAMAN AND NICOBAR ISLANDS" ~ "ANDAMAN & NICOBAR", .default = STATE_UT))
 
 extreme_events_lags <- extreme_events |> 
   arrange(STATE_UT, custom_year) |> 
@@ -83,7 +81,7 @@ extreme_events_lags <- extreme_events |>
 # --- GENERAL CLEANING ---
 
 population_clean <- population |> rename(STATE = STATE_UT) |> 
-  mutate(STATE = recode(STATE, "ANDAMAN AND NICOBAR ISLANDS" = "ANDAMAN & NICOBAR"))
+  mutate(STATE = case_match(STATE, "ANDAMAN AND NICOBAR ISLANDS" ~ "ANDAMAN & NICOBAR", .default = STATE))
 
 # for the spei, drop the "type" column (all weighted), and add "spei" to all the columns except for year and state_name
 spei_index <- spei_index |> 
@@ -98,10 +96,10 @@ spei_index <- spei_index |>
 
 spei_clean <- spei_index |> dplyr::select(-year) |> rename(year = year_start)
 flood_clean <- flood_index_lags |> rename(year = hydro_year) |> rename(STATE = STATE_UT) |> 
-  mutate(STATE = recode(STATE, "UTTAR>KHAND" = "UTTARAKHAND"))
+  mutate(STATE = case_match(STATE, "UTTAR>KHAND" ~ "UTTARAKHAND", .default = STATE))
 plfs_clean <- plfs_data |> mutate(year = as.numeric(str_extract(time, "\\d{4}"))) |>  rename(STATE = state_name)
 xtreme_pr_clean <- extreme_events_lags |> rename(year = custom_year) |> rename(STATE = STATE_UT) |> 
-  mutate(STATE = recode(STATE, "ANDAMAN AND NICOBAR ISLANDS" = "ANDAMAN & NICOBAR"))
+  mutate(STATE = case_match(STATE, "ANDAMAN AND NICOBAR ISLANDS" ~ "ANDAMAN & NICOBAR", .default = STATE))
 
 
 # List of dataframes to join
@@ -122,5 +120,5 @@ if("year" %in% colnames(population_clean)){
 
 final_df <- final_df |> filter(year >= 2017) # keep only years since 2017, since PLFS data starts in 2017
 
-write.csv(final_df, "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe_xxx.csv", row.names = FALSE)
+write.csv(final_df, "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe_weekly.csv", row.names = FALSE)
 colnames(final_df)

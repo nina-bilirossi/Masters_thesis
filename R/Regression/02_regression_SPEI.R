@@ -8,7 +8,7 @@
 # test the following SPEI: only the negative values, and full SPEI
 # both with 2 lags
 
-out <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/regressions/weighted_workers"
+out <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/regressions/weighted_workers_no_UT"
 dir.create(out, recursive = TRUE, showWarnings = FALSE)
 
 # ── Informality measure ───────────────────────────────────────────────────────
@@ -18,8 +18,8 @@ dir.create(out, recursive = TRUE, showWarnings = FALSE)
 # TABLE 1 – Full SPEI (spei_spei12) with 2 lags
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Spec 1a: contemporaneous only
-m1a <- lm(s_casual_w_worker_PS_unw ~ spei_spei12 +
+# Spec 1a: 1 lag
+m1a <- lm(s_casual_w_worker_PS_unw ~ spei_spei12 + spei_spei_lag1 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
           , weights = state_pop
@@ -27,15 +27,16 @@ m1a <- lm(s_casual_w_worker_PS_unw ~ spei_spei12 +
 
 summary(m1a)
 
-# Spec 1b: + lag 1
-m1b <- lm(s_casual_w_worker_PS_unw ~ spei_spei12 + spei_spei_lag1 +
+# Spec 1b: + lag 1 & 2
+m1b <- lm(s_casual_w_worker_PS_unw ~ spei_spei12 + spei_spei_lag1 + spei_spei_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
           , weights = state_pop
 ) 
 
-# Spec 1c: + lag 1 & lag 2  (optimal)
+# Spec 1c: + lag 1 & lag 2 & 3  (optimal)
 m1c <- lm(s_casual_w_worker_PS_unw ~ spei_spei12 + spei_spei_lag1 + spei_spei_lag2 +
+            spei_spei_lag3 +
           factor(STATE) + factor(year) + factor(STATE):year,
           data = data
           , weights = state_pop
@@ -71,20 +72,24 @@ cat("✓ Table 1 (Full SPEI) saved.\n")
 
 # Spec 2a: contemporaneous only
 m2a <- lm(s_casual_w_worker_PS_unw ~ spei_negative +
+            spei_neg_spei_lag1 +
           factor(STATE) + factor(year) + factor(STATE):year,
           data = data
           , weights = state_pop
 ) 
 
-# Spec 2b: + lag 1
-m2b <- lm(s_casual_w_worker_PS_unw ~ spei_negative + spei_neg_spei_lag1 +
+# Spec 2b: + lag 1 & 2
+m2b <- lm(s_casual_w_worker_PS_unw ~ spei_negative + 
+            spei_neg_spei_lag1 + spei_neg_spei_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
           , weights = state_pop
 ) 
 
-# Spec 2c: + lag 1 & lag 2  (optimal)
-m2c <- lm(s_casual_w_worker_PS_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 +
+# Spec 2c: + lag 1 & lag 2 & 3  (optimal)
+m2c <- lm(s_casual_w_worker_PS_unw ~ spei_negative 
+            + spei_neg_spei_lag1 + 
+            spei_neg_spei_lag2 + spei_neg_spei_lag3 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
           , weights = state_pop
@@ -113,6 +118,25 @@ stargazer(
   label      = "tab:neg_spei"
 )
 
+stargazer(
+  m2a, m2b, m2c,
+  se        = list(se2a[, 2], se2b[, 2], se2c[, 2]),
+  p         = list(se2a[, 4], se2b[, 4], se2c[, 4]),
+  title     = "Effect of Negative SPEI Shocks on Casual Labour-Force Participation (PS)",
+  dep.var.labels = "Share Casual Workers (PS, Unw.)",
+  #covariate.labels = c("Negative SPEI-12", "Neg. SPEI-12 Lag 1", "Neg. SPEI-12 Lag 2"),
+  
+  omit = c("factor\\(STATE\\)",
+           "factor\\(year\\)",
+           "factor\\(STATE\\):year",
+           "Constant"),
+  omit.stat  = c("f", "ser"),
+  notes      = "Includes state-year trend and population weights", #Negative SPEI captures drought/dry shock episodes only.
+  notes.append = FALSE,
+  type       = "text",
+  label      = "tab:neg_spei"
+)
+
 cat("✓ Table 2 (Negative SPEI) saved.\n")
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -138,6 +162,28 @@ stargazer(
   notes.append = FALSE,
   out        = file.path(out, "SPEI_full_vs_neg_workforce.tex"),
   type       = "latex",
+  label      = "tab:full_vs_neg"
+)
+
+stargazer(
+  m1c, m2c,
+  se        = list(se1c[, 2], se2c[, 2]),
+  p         = list(se1c[, 4], se2c[, 4]),
+  title     = "Full vs. Negative SPEI: Optimal Lag Specification",
+  dep.var.labels = "Share Casual Workers (PS/workers)",
+  covariate.labels = c(
+    "SPEI-12",         "SPEI-12 Lag 1",     "SPEI-12 Lag 2",
+    "Neg. SPEI-12",    "Neg. SPEI-12 Lag 1","Neg. SPEI-12 Lag 2"
+  ),
+  column.labels = c("Full SPEI", "Negative SPEI"),
+  omit = c("factor\\(STATE\\)",
+           "factor\\(year\\)",
+           "factor\\(STATE\\):year",
+           "Constant"),
+  omit.stat  = c("f", "ser"),
+  notes      = "Includes state-year trend and population weights",
+  notes.append = FALSE,
+  type       = "text",
   label      = "tab:full_vs_neg"
 )
 

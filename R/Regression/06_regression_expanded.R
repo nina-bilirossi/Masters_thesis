@@ -174,12 +174,13 @@ cat("✓ Table (Expanded male regression) saved.\n")
 
 # STARGAZER TABLE
 stargazer(
-  m1a_f, m1b_f, m1c_f,
-  m1a_m, m1b_m, m1c_m,
-  se = list(se1a_f[, 2], se1b_f[, 2], se1c_f[, 2], se1a_m[, 2], se1b_m[, 2], se1c_m[, 2]),
-  p = list(se1a_f[, 4], se1b_f[, 4], se1c_f[, 4], se1a_m[, 4], se1b_m[, 4], se1c_m[, 4]),
+  m1a_f, m1b_f, 
+  m1a_m, m1b_m, 
+  se = list(se1a_f[, 2], se1b_f[, 2], se1a_m[, 2], se1b_m[, 2]),
+  p = list(se1a_f[, 4], se1b_f[, 4], se1a_m[, 4], se1b_m[, 4]),
   title = "Effect of Climate Shocks on Informality by Gender",
-  dep.var.labels = "Informality Share (Casual/workers)",
+  dep.var.caption  = "",                          # <-- hides "Dependent variable:" row
+  dep.var.labels   = "Informality Share (Casual/Workers)",
   covariate.labels = c(
     "Negative SPEI-12",
     "Neg. SPEI-12 Lag 1",
@@ -188,20 +189,19 @@ stargazer(
     "Flood Index Lag 1",
     "Flood Index Lag 2"
   ),
-  column.labels = c("Female", "Male"),
-  column.separate = c(3, 3),
-  model.names = FALSE,
+  column.labels   = c("Female", "Male"),
+  column.separate = c(2, 2),
+  model.names     = FALSE,
   omit = c(
     "factor\\(STATE\\)",
     "factor\\(year\\)",
-    "factor\\(STATE\\):year"
+    "factor\\(STATE\\):year", "Constant"
   ),
-  omit.stat = c("f", "ser"),
-  notes = "Working age: 15–64.",
+  omit.stat    = c("f", "ser"),
+  notes        = "Working age: 15–64.",
   notes.append = FALSE,
-  out = file.path(out, "EXPANDED_gender_combined.tex"),
-  type = "latex",
-  label = "tab:expanded_gender"
+  type         = "text",
+  label        = "tab:expanded_gender"
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
