@@ -1,20 +1,16 @@
-# REGRESSION WITH BOTH CLIMATE SHOCK AND FLOOD INDEX, WITH THE OPTIMAL LAGS (2 lags for both)
-# CANCELLED: REGRESSION WITH ONE CLIMATE SHOCK AT THE TIME, BUT WITH LABOR FORCE AS AN EXPLANATORY VARIABLE
-
-out <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/regressions/weighted_workers"
-dir.create(out, recursive = TRUE, showWarnings = FALSE)
+# REGRESSION WITH BOTH CLIMATE SHOCK AND FLOOD INDEX, WITH THE OPTIMAL LAGS (3, 2)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FULL DATASET
 # ══════════════════════════════════════════════════════════════════════════════
 
-m1a <- lm(s_casual_w_worker_PS_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2+
+m1a <- lm(s_casual_w_worker_W_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
           , weights = state_pop
 ) 
 
-m1b <- lm(s_casual_w_worker_PS_unw ~ FI_state + FI_lag1 + FI_lag2+
+m1b <- lm(s_casual_w_worker_W_unw ~ FI_state + FI_lag1 + FI_lag2+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
           , weights = state_pop
@@ -23,6 +19,12 @@ m1b <- lm(s_casual_w_worker_PS_unw ~ FI_state + FI_lag1 + FI_lag2+
 m1c <- lm(s_casual_w_worker_PS_unw ~  spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 + FI_state + FI_lag1 + FI_lag2 +
           factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
+          , weights = state_pop
+) 
+
+m1c <- lm(s_casual_w_worker_W_unw ~  pr_score + pr_lag1 + pr_lag2 +
+            factor(STATE) + factor(year) + factor(STATE):year,
+          data = data
           , weights = state_pop
 ) 
 
@@ -36,24 +38,14 @@ stargazer(
   p  = list(se1a[, 4], se1b[, 4], se1c[, 4]),
   title          = "Effect of Climate Shocks on Informality (PS, weighted)",
   dep.var.labels = "Informality Share (Casual/workers)",
-  covariate.labels = c(
-    "Negative SPEI-12",
-    "Neg. SPEI-12 Lag 1",
-    "Neg. SPEI-12 Lag 2",
-    "Flood Index",
-    "Flood Index Lag 1",
-    "Flood Index Lag 2"
-  ),
-  column.labels   = c("SPEI only", "FI only", "SPEI + FI"),
   omit = c("factor\\(STATE\\)",
            "factor\\(year\\)",
-           "factor\\(STATE\\):year"),
+           "factor\\(STATE\\):year", "Constant"),
   column.separate = c(1, 1),
   omit.stat    = c("f", "ser"),
   notes        = "Working age: 15–64.", # Columns (3)–(5) exclude Arunachal Pradesh and Meghalaya (missing FI data).
   notes.append = FALSE,
-  out          = file.path(out, "EXPANDED_all.tex"),
-  type         = "latex",
+  type         = "text",
   label        = "tab:expanded_all"
 )
 
@@ -209,7 +201,7 @@ stargazer(
 # ══════════════════════════════════════════════════════════════════════════════
 # 1. RURAL
 
-m1a_rur <- lm(s_casual_w_worker_PS_rur_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 +
+m1a_rur <- lm(s_casual_w_worker_PS_rur_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 + spei_neg_spei_lag3 +
           factor(STATE) + factor(year) + factor(STATE):year,
           data = data
           , weights = state_pop
@@ -237,23 +229,15 @@ stargazer(
   p  = list(se1a_rur[, 4], se1b_rur[, 4], se1c_rur[, 4]),
   title          = "Effect of Climate Shocks on Informality in Rural Areas (PS, weighted)",
   dep.var.labels = "Informality Share (Casual/workers)",
-  covariate.labels = c(
-    "Negative SPEI-12",
-    "Neg. SPEI-12 Lag 1",
-    "Neg. SPEI-12 Lag 2",
-    "Flood Index",
-    "Flood Index Lag 1",
-    "Flood Index Lag 2"  ),
   omit = c("factor\\(STATE\\)",
            "factor\\(year\\)",
-           "factor\\(STATE\\):year"),
+           "factor\\(STATE\\):year", "Constant"),
   column.labels   = c("SPEI", "FI", "SPEI + FI"),
   column.separate = c(1, 1),
   omit.stat    = c("f", "ser"),
   notes        = "Working age: 15–64.",
   notes.append = FALSE,
-  out          = file.path(out, "EXPANDED_RURAL.tex"),
-  type         = "latex",
+  type         = "text",
   label        = "tab:expanded_rural"
 )
 
@@ -261,19 +245,19 @@ cat("✓ Table (Expanded rural regression) saved.\n")
 
 # 2. URBAN
 
-m1a_urb <- lm(s_casual_w_worker_PS_urb_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 +
+m1a_urb <- lm(s_casual_w_worker_W_urb_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 + spei_neg_spei_lag3 +
           factor(STATE) + factor(year) + factor(STATE):year,
           data = data
           , weights = state_pop
 )
 
-m1b_urb <- lm(s_casual_w_worker_PS_urb_unw ~ FI_state + FI_lag1 + FI_lag2+
+m1b_urb <- lm(s_casual_w_worker_W_urb_unw ~ FI_state + FI_lag1 + FI_lag2+
           factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
           , weights = state_pop
 )
 
-m1c_urb <- lm(s_casual_w_worker_PS_urb_unw ~  spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 + FI_state + FI_lag1 + FI_lag2 +
+m1c_urb <- lm(s_casual_w_worker_W_urb_unw ~  spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 + FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
           , weights = state_pop
@@ -315,32 +299,23 @@ cat("✓ Table (Expanded urban regression) saved.\n")
 
 # STARGAZER TABLE
 stargazer(
-  m1a_rur, m1b_rur, m1c_rur,
-  m1a_urb, m1b_urb, m1c_urb,
-  se = list(se1a_rur[, 2], se1b_rur[, 2], se1c_rur[, 2], se1a_urb[, 2], se1b_urb[, 2], se1c_urb[, 2]),
-  p = list(se1a_rur[, 4], se1b_rur[, 4], se1c_rur[, 4], se1a_urb[, 4], se1b_urb[, 4], se1c_urb[, 4]),
+  m1a_rur, m1b_rur, 
+  m1a_urb, m1b_urb,
+  se = list(se1a_rur[, 2], se1b_rur[, 2], se1a_urb[, 2], se1b_urb[, 2]),
+  p = list(se1a_rur[, 4], se1b_rur[, 4], se1a_urb[, 4], se1b_urb[, 4]),
   title = "Effect of Climate Shocks on Informality by Settlement",
-  dep.var.labels = "Informality Share (Casual/workers)",
-  covariate.labels = c(
-    "Negative SPEI-12",
-    "Neg. SPEI-12 Lag 1",
-    "Neg. SPEI-12 Lag 2",
-    "Flood Index",
-    "Flood Index Lag 1",
-    "Flood Index Lag 2"
-  ),
+  dep.var.labels = c("",""),
   column.labels = c("Rural", "Urban"),
-  column.separate = c(3, 3),
+  column.separate = c(2, 2),
   model.names = FALSE,
   omit = c(
     "factor\\(STATE\\)",
     "factor\\(year\\)",
-    "factor\\(STATE\\):year"
+    "factor\\(STATE\\):year", "Constant"
   ),
   omit.stat = c("f", "ser"),
   notes = "Working age: 15–64.",
   notes.append = FALSE,
-  out = file.path(out, "EXPANDED_settlement_combined.tex"),
   type = "latex",
   label = "tab:expanded_settlement"
 )
