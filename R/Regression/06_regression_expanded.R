@@ -1,28 +1,40 @@
 # REGRESSION WITH BOTH CLIMATE SHOCK AND FLOOD INDEX, WITH THE OPTIMAL LAGS (3, 2)
 
+
+data_robust <-  data |> filter(STATE != "PUDUCHERRY" & STATE != "DADRA & NAGAR HAVELI & DAMAN & DIU") |>
+  filter(STATE != "JAMMU AND KASHMIR" & STATE != "LADAKH")
+data_flood_robust <- data_flood |> filter(STATE != "PUDUCHERRY" & STATE != "DADRA & NAGAR HAVELI & DAMAN & DIU") |> 
+  filter(STATE != "JAMMU AND KASHMIR" & STATE != "LADAKH")
+
 # ══════════════════════════════════════════════════════════════════════════════
 # FULL DATASET
 # ══════════════════════════════════════════════════════════════════════════════
 
-m1a <- lm(s_casual_w_worker_W_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
+m1a <- lm(s_casual_w_worker_PS_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
           , weights = state_pop
 ) 
 
-m1b <- lm(s_casual_w_worker_W_unw ~ FI_state + FI_lag1 + FI_lag2+
+m1a <- lm(s_casual_w_worker_PS_unw ~ spei_spei12 + spei_spei_lag1 + spei_spei_lag2+ spei_spei_lag3+
+            factor(STATE) + factor(year) + factor(STATE):year,
+          data = data
+          , weights = state_pop
+) 
+
+m1b <- lm(s_casual_w_worker_PS_unw ~ FI_state + FI_lag1 + FI_lag2+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
           , weights = state_pop
 ) 
 
-m1c <- lm(s_casual_w_worker_PS_unw ~  spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 + FI_state + FI_lag1 + FI_lag2 +
+m1c <- lm(s_casual_w_worker_W_unw ~  spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 + pr_score + pr_lag1 + pr_lag2 +
           factor(STATE) + factor(year) + factor(STATE):year,
-          data = data_flood
+          data = data
           , weights = state_pop
 ) 
 
-m1c <- lm(s_casual_w_worker_W_unw ~  pr_score + pr_lag1 + pr_lag2 +
+m1c <- lm(s_casual_w_worker_PS_unw ~  pr_score + pr_lag1 + pr_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
           , weights = state_pop

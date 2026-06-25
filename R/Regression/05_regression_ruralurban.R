@@ -5,10 +5,24 @@ dir.create(out,  recursive = TRUE, showWarnings = FALSE)
 
 colnames(data)
 
+library(dplyr)
+
+df <- data %>%
+  group_by(STATE) %>%
+  mutate(
+    pop_rur_unw_2017 = max(if_else(year == 2017, pop_rur_unw, NA_real_), na.rm = TRUE),
+    pop_urb_unw_2017 = max(if_else(year == 2017, pop_urb_unw, NA_real_), na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+data <- df
+data_flood <- df |> filter(STATE != "ARUNCHAL PRADESH" & STATE != "MEGHALAYA")
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # SPEI — Sector subgroups (optimal spec: contemp. + lag1 + lag2)
-# Rural outcome:  s_casual_w_worker_PS_rur_unw
-# Urban outcome: s_casual_w_worker_PS_urb_unw
+# Rural outcome:  s_casual_w_worker_W_rur_unw
+# Urban outcome: s_casual_w_worker_W_urb_unw
 # ══════════════════════════════════════════════════════════════════════════════
 # 
 # # ── Full SPEI ──────────────────────────────────────────────────────────────────
@@ -52,14 +66,14 @@ spei_neg_r <- lm(s_casual_w_worker_W_rur_unw ~ spei_negative + spei_neg_spei_lag
                    spei_neg_spei_lag3 +
                     factor(STATE) + factor(year) + factor(STATE):year,
                   data = data
-                  , weights = pop_rur_unw #state_pop
+                  , weights = pop_rur_unw_2017 #state_pop
 ) 
 
 spei_neg_u <- lm(s_casual_w_worker_W_urb_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2+
                    spei_neg_spei_lag3 +
                   factor(STATE) + factor(year) + factor(STATE):year,
                   data = data
-                  , weights = pop_urb_unw # state_pop
+                  , weights = pop_urb_unw_2017 # state_pop
 ) 
 
 se_spei_neg_r <- cluster_se(spei_neg_r)
@@ -96,13 +110,13 @@ stargazer(
 fi_r <- lm(s_casual_w_worker_W_rur_unw ~ FI_state + FI_lag1 + FI_lag2+
              factor(STATE) + factor(year) + factor(STATE):year,
            data = data_flood
-           , weights = pop_rur_unw
+           , weights = pop_rur_unw_2017
 ) 
 
 fi_u <- lm(s_casual_w_worker_W_urb_unw ~  FI_state + FI_lag1 + FI_lag2+
              factor(STATE) + factor(year) + factor(STATE):year,
            data = data_flood
-           , weights = pop_urb_unw
+           , weights = pop_urb_unw_2017
 ) 
 
 se_fi_r <- cluster_se(fi_r)
@@ -128,16 +142,16 @@ stargazer(
 )
 
 # ── PR Index ───────────────────────────────────────────────────────────────────
-pr_r <- lm(s_casual_w_worker_PS_rur_unw ~ pr_score + pr_lag1 +# pr_lag2 +
+pr_r <- lm(s_casual_w_worker_PS_rur_unw ~ pr_score + pr_lag1 + pr_lag2 +
              factor(STATE) + factor(year) + factor(STATE):year,
            data = data
-           , weights = state_pop
+           , weights = pop_rur_unw_2017
 ) 
 
-pr_u <- lm(s_casual_w_worker_PS_urb_unw ~ pr_score + pr_lag1 + #pr_lag2 +
+pr_u <- lm(s_casual_w_worker_PS_urb_unw ~ pr_score + pr_lag1 + pr_lag2 +
              factor(STATE) + factor(year) + factor(STATE):year,
            data = data
-           , weights = state_pop
+           , weights = pop_urb_unw_2017
 ) 
 se_pr_r <- cluster_se(pr_r)
 se_pr_u <- cluster_se(pr_u)
@@ -175,6 +189,27 @@ stargazer(
   type         = "text",
   label        = "tab:sector_pr"
 )
-cat("✓ PR Index — sector table saved.\n")
 
-cat("\nAll sector subgroup tables saved.\n")
+# ==============================================================================
+# MEGA TABLE
+# ==============================================================================
+
+stargazer(
+  spei_neg_r, spei_neg_u, fi_r, fi_u, pr_r, pr_u,  
+  se             = list(se_spei_neg_r[, 2], se_spei_neg_u[, 2],
+                        se_fi_r[, 2],       se_fi_u[, 2],
+                        se_pr_r[, 2],       se_pr_u[, 2]),         
+  p              = list(se_spei_neg_r[, 4], se_spei_neg_u[, 4],
+                        se_fi_r[, 4],       se_fi_u[, 4],
+                        se_pr_r[, 4],       se_pr_u[, 4]),         
+  title          = "Casual Labour-Force Participation by Settlement",
+  dep.var.caption        = "Casual Labour Share (W)",
+  dep.var.labels.include = FALSE,
+  column.labels  = c("Rural", "Urban", "Rural", "Urban", "Rural", "Urban"),  
+  omit           = c("factor\\(STATE\\)", "factor\\(year\\)", "factor\\(STATE\\):year", "Constant"),
+  omit.stat      = c("f", "ser"),
+  notes          = "Rural and urban population weights from 2017 survey used.",
+  notes.append   = FALSE,
+  label          = "tab:settlementW",
+  type           = "latex"
+)

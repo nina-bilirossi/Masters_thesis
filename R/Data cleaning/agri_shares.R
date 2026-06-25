@@ -46,7 +46,7 @@ uts_to_drop <- c(
   "DADRA & NAGAR HAVELI & DAMAN & DIU",
   "DELHI",
   #"JAMMU AND KASHMIR",  
-  "LADAKH",
+  #"LADAKH",
   "PUDUCHERRY"
 )
 
