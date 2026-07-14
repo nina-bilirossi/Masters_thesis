@@ -22,6 +22,8 @@ create_state_grid <- function(data_subset, title_suffix) {
     facet_wrap(~state_name, ncol = 4, scales = "free_y") + 
     # Styling
     scale_color_manual(values = c("TRUE" = "blue", "FALSE" = "red"), guide = "none") +
+    scale_x_continuous(labels = scales::label_number(accuracy = 1, big.mark = "")) +
+    scale_y_continuous(labels = scales::label_number(accuracy = 1))+
     theme_minimal() +
     labs(
       title = paste("Population-Weighted SPEI12 Trends:", title_suffix),

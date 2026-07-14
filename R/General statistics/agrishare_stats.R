@@ -8,7 +8,7 @@ overall_stats <- data %>%
     c(spei_negative, FI_state, pr_score),
     list(
       mean = ~ mean(.x, na.rm = TRUE),
-      se   = ~ sd(.x, na.rm = TRUE) / sqrt(sum(!is.na(.x))),
+      se   = ~ sd(.x, na.rm = TRUE),
       min  = ~ min(.x, na.rm = TRUE),
       max  = ~ max(.x, na.rm = TRUE)
     ),
@@ -29,7 +29,7 @@ group_stats <- df_sections_agri %>%
     c(spei_negative, FI_state, pr_score),
     list(
       mean = ~ mean(.x, na.rm = TRUE),
-      se   = ~ sd(.x, na.rm = TRUE) / sqrt(sum(!is.na(.x))),
+      se   = ~ sd(.x, na.rm = TRUE),
       min  = ~ min(.x, na.rm = TRUE),
       max  = ~ max(.x, na.rm = TRUE)
     ),
@@ -52,7 +52,7 @@ latex_output <- kable(
   format = "latex", 
   booktabs = TRUE, 
   digits = 3, # Rounds all numeric columns to 3 decimal places
-  col.names = c("Group", "Variable", "Mean", "Std. Error", "Min", "Max"),
+  col.names = c("Group", "Variable", "Mean", "SD", "Min", "Max"),
   caption = "Summary Statistics for Climate Shocks and State Scores",
   label = "tab:summary_stats"
 )

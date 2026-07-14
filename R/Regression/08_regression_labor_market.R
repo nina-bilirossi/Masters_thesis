@@ -75,22 +75,22 @@ stargazer(
 # ==============================================================================
 # GENDERED MODELS
 # male
-m2a <- lm(lf_share_m_unw ~ spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
+m2a <- lm(lf_share_m_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_m_unw
+          , weights = pop_m_unw_2017
 ) 
 
-m2b <- lm(worker_share_m_unw ~  spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
+m2b <- lm(worker_share_m_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_m_unw
+          , weights = pop_m_unw_2017
 ) 
 
-m2c <- lm(unemp_PS_m_unw ~ spei_neg_spei_lag1 + spei_neg_spei_lag2+spei_neg_spei_lag3+
+m2c <- lm(unemp_PS_m_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2+spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_m_unw) 
+          , weights = pop_m_unw_2017) 
 
 
 se2a <- cluster_se(m2a)
@@ -100,22 +100,22 @@ se2c <- cluster_se(m2c)
 
 # FEMALE
 
-m3a <- lm(lf_share_f_unw ~  spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
+m3a <- lm(lf_share_f_unw ~  spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_f_unw
+          , weights = pop_f_unw_2017
 ) 
 
-m3b <- lm(worker_share_f_unw ~  spei_neg_spei_lag1 + spei_neg_spei_lag2 + spei_neg_spei_lag3+
+m3b <- lm(worker_share_f_unw ~  spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 + spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_f_unw
+          , weights = pop_f_unw_2017
 ) 
 
-m3c <- lm(unemp_PS_f_unw ~ spei_neg_spei_lag1 + spei_neg_spei_lag2+spei_neg_spei_lag3+
+m3c <- lm(unemp_PS_f_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2+spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_f_unw) 
+          , weights = pop_f_unw_2017) 
 
 
 se3a <- cluster_se(m3a)
@@ -168,19 +168,19 @@ stargazer(
 m4a <- lm(lf_share_rur_unw ~ spei_negative +spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_rur_unw
+          , weights = pop_rur_unw_2017
 ) 
 
 m4b <- lm(worker_share_rur_unw ~ spei_negative +spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_rur_unw
+          , weights = pop_rur_unw_2017
 ) 
 
 m4c <- lm(unemp_PS_rur_unw ~ spei_negative +spei_neg_spei_lag1 + spei_neg_spei_lag2+spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_rur_unw) 
+          , weights = pop_rur_unw_2017) 
 
 
 se4a <- cluster_se(m4a)
@@ -190,22 +190,22 @@ se4c <- cluster_se(m4c)
 
 # urban
 
-m5a <- lm(lf_share_urb_unw ~ spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
+m5a <- lm(lf_share_urb_unw ~ spei_negative +spei_neg_spei_lag1 + spei_neg_spei_lag2+ spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_urb_unw
+          , weights = pop_urb_unw_2017
 ) 
 
-m5b <- lm(worker_share_urb_unw ~ spei_neg_spei_lag1 + spei_neg_spei_lag2 + spei_neg_spei_lag3+
+m5b <- lm(worker_share_urb_unw ~ spei_negative +spei_neg_spei_lag1 + spei_neg_spei_lag2 + spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_urb_unw
+          , weights = pop_urb_unw_2017
 ) 
 
-m5c <- lm(unemp_PS_urb_unw ~ spei_neg_spei_lag1 + spei_neg_spei_lag2+spei_neg_spei_lag3+
+m5c <- lm(unemp_PS_urb_unw ~ spei_negative +spei_neg_spei_lag1 + spei_neg_spei_lag2+spei_neg_spei_lag3+
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data
-          , weights = pop_urb_unw) 
+          , weights = pop_urb_unw_2017) 
 
 
 se5a <- cluster_se(m5a)
@@ -298,22 +298,22 @@ stargazer(
 # ==============================================================================
 # GENDERED MODELS
 # male
-m2a <- lm(lf_share_m_unw ~ FI_lag1 + FI_lag2 +
+m2a <- lm(lf_share_m_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_m_unw
+          , weights = pop_m_unw_2017
 ) 
 
-m2b <- lm(worker_share_m_unw ~ FI_lag1 + FI_lag2 +
+m2b <- lm(worker_share_m_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_m_unw
+          , weights = pop_m_unw_2017
 ) 
 
-m2c <- lm(unemp_PS_m_unw ~ FI_lag1 + FI_lag2 +
+m2c <- lm(unemp_PS_m_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_m_unw) 
+          , weights = pop_m_unw_2017) 
 
 
 se2a <- cluster_se(m2a)
@@ -323,22 +323,22 @@ se2c <- cluster_se(m2c)
 
 # FEMALE
 
-m3a <- lm(lf_share_f_unw ~ FI_lag1 + FI_lag2 +
+m3a <- lm(lf_share_f_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_f_unw
+          , weights = pop_f_unw_2017
 ) 
 
-m3b <- lm(worker_share_f_unw ~ FI_lag1 + FI_lag2 +
+m3b <- lm(worker_share_f_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_f_unw
+          , weights = pop_f_unw_2017
 ) 
 
-m3c <- lm(unemp_PS_f_unw ~ FI_lag1 + FI_lag2 +
+m3c <- lm(unemp_PS_f_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_f_unw) 
+          , weights = pop_f_unw_2017) 
 
 
 se3a <- cluster_se(m3a)
@@ -391,19 +391,19 @@ stargazer(
 m4a <- lm(lf_share_rur_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_rur_unw
+          , weights = pop_rur_unw_2017
 ) 
 
 m4b <- lm(worker_share_rur_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_rur_unw
+          , weights = pop_rur_unw_2017
 ) 
 
 m4c <- lm(unemp_PS_rur_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_rur_unw) 
+          , weights = pop_rur_unw_2017) 
 
 
 se4a <- cluster_se(m4a)
@@ -416,19 +416,19 @@ se4c <- cluster_se(m4c)
 m5a <- lm(lf_share_urb_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_urb_unw
+          , weights = pop_urb_unw_2017
 ) 
 
 m5b <- lm(worker_share_urb_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_urb_unw
+          , weights = pop_urb_unw_2017
 ) 
 
 m5c <- lm(unemp_PS_urb_unw ~ FI_state + FI_lag1 + FI_lag2 +
             factor(STATE) + factor(year) + factor(STATE):year,
           data = data_flood
-          , weights = pop_urb_unw) 
+          , weights = pop_urb_unw_2017) 
 
 
 se5a <- cluster_se(m5a)
