@@ -10,7 +10,7 @@ flood_index <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code
 spei_index <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/spei_with_lags.csv")
 population <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/state_population.csv")
 #plfs_data <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/plfs/new-PLFS_all_s_N_unw.csv')
-extreme_events <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/python results/combined_states_scores_new.csv") |> 
+extreme_events <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/python results/july redo/combined_states_scores_july.csv") |> 
   filter(custom_year >= 2013)
 
 # plfs_deeper <- read.csv('/Users/ninabilirossi/Desktop/MSC THESIS/Data works/My data prep/PLFS processed/deeper-PLFS_all_s_N_unw.csv')
@@ -120,5 +120,5 @@ if("year" %in% colnames(population_clean)){
 
 final_df <- final_df |> filter(year >= 2017) # keep only years since 2017, since PLFS data starts in 2017
 
-write.csv(final_df, "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe_weekly.csv", row.names = FALSE)
+write.csv(final_df, "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe_july.csv", row.names = FALSE)
 colnames(final_df)
