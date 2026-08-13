@@ -1,3 +1,15 @@
+
+# ==============================================================================
+# This script runs regressions to analyze the impact of the drought and flood, 
+# on informality when indices are included simultaneously.
+
+# Results are presented in stargazer tables for export.
+
+# see Manuscript: section 6.3:Robustness for details.
+
+# ==============================================================================
+
+
 # USING FI
 
 m1a <- lm(s_casual_w_worker_PS_unw ~ spei_negative + spei_neg_spei_lag1 + 

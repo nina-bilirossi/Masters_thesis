@@ -1,3 +1,16 @@
+# ==============================================================================
+# This script runs regressions to analyze the impact of the drought index
+# on informality among different industrial sectors separately.
+
+# !!! Beware that the PLFS is not meant to be representative at the sectoral 
+# level, so these results should be interpreted with caution.
+
+# Results are presented in stargazer tables for export.
+
+# see Manuscript: section 6.Results:Industry effect for details.
+
+# ==============================================================================
+
 reg_data <- data_indu %>% filter(!is.na(share_Agriculture))  # drop unmatched rows
 
 run_spei_model <- function(outcome_var, dat) {

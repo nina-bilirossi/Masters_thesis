@@ -8,9 +8,6 @@
 
 # ==============================================================================
 
-
-# ── SOME SUMMARY STATISTICS & data cleaning ──────────────
-
 source("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/02_General statistics/labor_data_baseline_comparison.R")
 
 data <- data %>%

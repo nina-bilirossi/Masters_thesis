@@ -1,3 +1,14 @@
+# ==============================================================================
+# This script runs regressions to analyze the impact of the drougth and flood, 
+# when indices are interacted with each other, on informality. 
+
+# Results are presented in stargazer tables for export.
+
+# see Manuscript: section 6.3:Robustness for details.
+
+# ==============================================================================
+
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TABLE 1 – FI
