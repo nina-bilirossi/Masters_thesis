@@ -19,22 +19,22 @@ plfs_agr_shares <- read_csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/
   filter(STATE != "LAKSHADWEEP")
 
 
-df_sections <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe_july.csv") %>%
+df_sections <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe_july.csv") |> 
   filter(STATE != "LAKSHADWEEP")
 
 
-# unmatched_states1 <- plfs_agr_shares %>%
-#   anti_join(df_sections, by = c("STATE")) %>%
+# unmatched_states1 <- plfs_agr_shares |> 
+#   anti_join(df_sections, by = c("STATE")) |> 
 #   distinct(STATE)
-# unmatched_states2 <- df_sections %>%
-#   anti_join(plfs_agr_shares, by = c("STATE")) %>%
+# unmatched_states2 <- df_sections |> 
+#   anti_join(plfs_agr_shares, by = c("STATE")) |> 
 #   distinct(STATE)
 # 
 # unmatched_states1
 # unmatched_states2
 
 
-plfs_agr_shares <- plfs_agr_shares %>%
+plfs_agr_shares <- plfs_agr_shares |> 
   mutate(STATE = dplyr::recode(STATE,
                           "D & N. HAVELI & DAMAN & DIU" = "DADRA & NAGAR HAVELI & DAMAN & DIU",
                           "JAMMU & KASHMIR" = "JAMMU AND KASHMIR",
@@ -42,7 +42,7 @@ plfs_agr_shares <- plfs_agr_shares %>%
                           "UTTRAKHAND" = "UTTARAKHAND"
                          ))
 
-df_sections <- df_sections %>%
+df_sections <- df_sections |> 
   left_join(plfs_agr_shares, by = "STATE") |> 
   mutate(agri_share_std = as.numeric(scale(share_agri_weighted)))
 
@@ -59,13 +59,13 @@ uts_to_drop <- c(
   "PUDUCHERRY"
 )
 
-df_sections <- df_sections %>%
+df_sections <- df_sections |> 
   filter(!STATE %in% uts_to_drop)
 
 # --- Agri median ---
 med <- median(df_sections$share_agri_weighted, na.rm = TRUE)
 
-df_sections <- df_sections %>%
+df_sections <- df_sections |> 
   mutate(
     agri_group = if_else(
       share_agri_weighted <= med,

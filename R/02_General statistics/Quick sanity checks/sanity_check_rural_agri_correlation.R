@@ -56,11 +56,11 @@ urbanization_df <- tribble(
 )
 
 # 2. Clean, filter, and rename to match your target list
-cleaned_states_df <- urbanization_df %>%
+cleaned_states_df <- urbanization_df |> 
   # Clean up the names dynamically: remove " (NE)" or trailing parentheticals, and uppercase
-  mutate(state_ut = str_replace(state_ut, "\\s*\\(NE\\)", "")) %>%
-  mutate(state_ut = ifelse(str_detect(state_ut, "Telangana"), "TELANGANA", toupper(state_ut))) %>%
-  mutate(state_ut = ifelse(state_ut == "ORISSA", "ODISHA", state_ut)) %>%
+  mutate(state_ut = str_replace(state_ut, "\\s*\\(NE\\)", "")) |> 
+  mutate(state_ut = ifelse(str_detect(state_ut, "Telangana"), "TELANGANA", toupper(state_ut))) |> 
+  mutate(state_ut = ifelse(state_ut == "ORISSA", "ODISHA", state_ut)) |> 
   
   # Filter to keep ONLY the 29 states present in your target vector
   filter(state_ut %in% c(
@@ -70,7 +70,7 @@ cleaned_states_df <- urbanization_df %>%
     "MANIPUR", "MEGHALAYA", "MIZORAM", "NAGALAND", "ODISHA", "PUNJAB", 
     "RAJASTHAN", "SIKKIM", "TAMIL NADU", "TELANGANA", "TRIPURA", 
     "UTTAR PRADESH", "UTTARAKHAND", "WEST BENGAL"
-  )) %>%
+  )) |> 
   rename(STATE = state_ut)
 
 # View the cleaned dataframe
@@ -79,15 +79,15 @@ print(cleaned_states_df, n = Inf)
 
 # 1. Join your PLFS data with the cleaned urbanization data
 # (Replacing 'cleaned_states_df' with whatever you named the previous tibble)
-merged_data <- cleaned_states_df %>%
-  inner_join(plfs_agr_shares, by = "STATE") %>%
+merged_data <- cleaned_states_df |> 
+  inner_join(plfs_agr_shares, by = "STATE") |> 
   # Drop rows with NA in either column so correlation calculates properly
   filter(!is.na(urbanization_rate_2011), !is.na(share_agri_weighted))
 
 # Add population
-state_populations <- data %>%
+state_populations <- data |> 
   distinct(STATE, state_pop)
-merged_data <- merged_data %>%
+merged_data <- merged_data |> 
   left_join(state_populations, by = "STATE")
 
 

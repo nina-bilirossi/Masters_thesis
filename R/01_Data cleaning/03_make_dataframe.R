@@ -39,17 +39,17 @@ states_plfs
 states_spei <- unique(spei_index$state_name)
 
 # figuring out which states do not have a match
-unmatched_states1 <- plfs_data %>%
-  anti_join(spei_index, by = c("state_name")) %>%
+unmatched_states1 <- plfs_data |> 
+  anti_join(spei_index, by = c("state_name")) |> 
   distinct(state_name)
-unmatched_states2 <- spei_index %>%
-  anti_join(plfs_data, by = c("state_name")) %>%
+unmatched_states2 <- spei_index |> 
+  anti_join(plfs_data, by = c("state_name")) |> 
   distinct(state_name)
 
 unmatched_states1
 unmatched_states2
 
-plfs_data <- plfs_data %>%
+plfs_data <- plfs_data |> 
   mutate(state_name = case_match(
     state_name,
     "JAMMU & KASHMIR" ~ "JAMMU AND KASHMIR",
@@ -117,16 +117,16 @@ xtreme_pr_clean <- extreme_events_lags |> rename(year = custom_year) |> rename(S
 data_list <- list(spei_clean, flood_clean, plfs_clean, xtreme_pr_clean)
 
 # Join the first three (assuming they all have state AND year)
-final_df <- data_list %>% 
+final_df <- data_list |>  
   reduce(left_join, by = c("STATE", "year"))
 
 # Final step: Join the population 
 # (Since population often doesn't change yearly in these datasets, 
 # we join it by state only if 'year' isn't in pop_clean)
 if("year" %in% colnames(population_clean)){
-  final_df <- final_df %>% left_join(population_clean, by = c("STATE", "year"))
+  final_df <- final_df |>  left_join(population_clean, by = c("STATE", "year"))
 } else {
-  final_df <- final_df %>% left_join(population_clean, by = "STATE")
+  final_df <- final_df |>  left_join(population_clean, by = "STATE")
 }
 
 final_df <- final_df |> filter(year >= 2017) # keep only years since 2017, since PLFS data starts in 2017

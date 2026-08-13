@@ -23,9 +23,9 @@ library(grepl)
 # ============================================================
 
 # Filter for weighted data and remove NA/Disputed rows
-plot_data <- spei_long %>%
-  filter(type == "weighted") %>%
-  filter(!is.na(spei12)) %>%
+plot_data <- spei_long |> 
+  filter(type == "weighted") |> 
+  filter(!is.na(spei12)) |> 
   filter(!grepl("DISPUTED", state_name))
 
 # Split states into two groups for two separate grids
@@ -63,32 +63,32 @@ grid0 <- create_state_grid(plot_data, "Raw data")
 print(grid0)
 
 # Generate Group 1 (A-M roughly)
-grid1 <- create_state_grid(plot_data %>% filter(state_name %in% states_group1), "Group A")
+grid1 <- create_state_grid(plot_data |>  filter(state_name %in% states_group1), "Group A")
 print(grid1)
 
 # Generate Group 2 (N-Z roughly)
-grid2 <- create_state_grid(plot_data %>% filter(state_name %in% states_group2), "Group B")
+grid2 <- create_state_grid(plot_data |>  filter(state_name %in% states_group2), "Group B")
 print(grid2)
 
 india <- st_read("~/Desktop/MSC THESIS/Data works/Code/Data/geography/State_District_Sub-district_Boundary_of_entire_India/State Boundary.shp")
 
-spei_weighted_long <- spei_yearly %>%
+spei_weighted_long <- spei_yearly |> 
   pivot_longer(
     cols = starts_with("weighted_SPEI12_"),
     names_to = "year",
     names_prefix = "weighted_SPEI12_",
     values_to = "spei12"
-  ) %>%
+  ) |> 
   mutate(year = as.integer(year), type = "Weighted") |> 
   filter(!grepl("disputed", STATE, ignore.case = TRUE))
 
-spei_unweighted_long <- spei_yearly %>%
+spei_unweighted_long <- spei_yearly |> 
   pivot_longer(
     cols = starts_with("unweighted_SPEI12_"),
     names_to = "year",
     names_prefix = "unweighted_SPEI12_",
     values_to = "spei12"
-  ) %>%
+  ) |> 
   mutate(year = as.integer(year), type = "Unweighted") |> 
   filter(!grepl("disputed", STATE, ignore.case = TRUE))
 
@@ -117,8 +117,8 @@ boxplot_comparison_spei
 # ============================================================
 
 # --- 1a. State-level summary (mean, sd, min, max across years) ---
-spei_state_summary <- spei_weighted_long %>%
-  group_by(STATE) %>%
+spei_state_summary <- spei_weighted_long |> 
+  group_by(STATE) |> 
   summarise(
     mean_spei  = mean(spei12, na.rm = TRUE),
     sd_spei    = sd(spei12, na.rm = TRUE),
@@ -126,12 +126,12 @@ spei_state_summary <- spei_weighted_long %>%
     max_spei   = max(spei12, na.rm = TRUE),
     range_spei = max_spei - min_spei,
     .groups = "drop"
-  ) %>%
+  ) |> 
   arrange(desc(sd_spei))   # states with most inter-year variation first
 
 print(spei_state_summary)
 
-spei_summary <- spei_weighted_long %>%
+spei_summary <- spei_weighted_long |> 
   summarise(
     mean_inf  = mean(spei12, na.rm = TRUE),
     median_inf = median(spei12, na.rm = TRUE),
@@ -144,8 +144,8 @@ spei_summary <- spei_weighted_long %>%
 print(spei_summary)
 
 # --- 1b. Ranked: which states have highest inter-year variation? ---
-spei_variation_rank <- spei_state_summary %>%
-  dplyr::select(STATE, sd_spei, range_spei) %>%
+spei_variation_rank <- spei_state_summary |> 
+  dplyr::select(STATE, sd_spei, range_spei) |> 
   mutate(rank_sd = rank(-sd_spei))
 
 print(spei_variation_rank)
@@ -186,16 +186,16 @@ ggplot(spei_weighted_long, aes(x = year, y = reorder(STATE, spei12, FUN = mean),
 
 # Physical map
 
-india_map_data <- india %>%
+india_map_data <- india |> 
   left_join(
-    spei_state_summary %>% 
-      dplyr::select(STATE, mean_spei, sd_spei) %>%
-      left_join(spei_variation_rank %>% dplyr::select(STATE, rank_sd), by = "STATE"),
+    spei_state_summary |>  
+      dplyr::select(STATE, mean_spei, sd_spei) |> 
+      left_join(spei_variation_rank |>  dplyr::select(STATE, rank_sd), by = "STATE"),
     by = c("STATE" = "STATE")
   ) |>  filter(!grepl("disputed", STATE, ignore.case = TRUE))
 
-unmatched <- india_map_data %>% 
-  filter(is.na(sd_spei)) %>% 
+unmatched <- india_map_data |>  
+  filter(is.na(sd_spei)) |>  
   pull(STATE)
 print(unmatched)
 

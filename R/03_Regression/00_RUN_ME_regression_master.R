@@ -34,17 +34,17 @@ uts_to_drop <- c(
   #"DELHI",
   #"JAMMU AND KASHMIR",  
   #"LADAKH",
-  "PUDUCHERRY"
+  "PUDUCHERRY" 
 )
 
-data_no_UT <- data %>%
+data_no_UT <- data |> 
   filter(!STATE %in% uts_to_drop)
 
 data_flood <- data |> # drop those states since they have missing data for the flood variable
   filter(STATE != "ARUNACHAL PRADESH") |>   # missing FI data
   filter(STATE != "MEGHALAYA")               # missing FI data
 
-data_flood_no_UT <- data_flood %>%
+data_flood_no_UT <- data_flood |> 
   filter(!STATE %in% uts_to_drop)
 
 # colnames(data)
@@ -55,7 +55,7 @@ pdata_fi <- pdata.frame(data_flood_no_UT, index = c("STATE", "year"))
 
 # ── SOME SUMMARY STATISTICS (clean this up somewhere else later) ──────────────
 
-data %>%
+data |> 
   filter(year == 2017) |>
   dplyr::select(
     "SPEI 12" = spei_spei12, 
@@ -73,8 +73,8 @@ data %>%
     # "Inf.s (rural)" = s_casual_w_worker_PS_rur_unw,
     # "Inf.s (urban)" = s_casual_w_worker_PS_urb_unw,
     "State population" = state_pop
-  ) %>%
-  dplyr::mutate(across(everything(), as.numeric)) %>%
+  ) |> 
+  dplyr::mutate(across(everything(), as.numeric)) |> 
   datasummary_skim(
     fun_numeric = list(
       Count = \(x) sum(!is.na(x)),
@@ -96,7 +96,7 @@ cluster_se <- function(model) {
 #----------------------------
 
 # renamed dataset
-df_sum <- data %>%
+df_sum <- data |> 
   filter(year == 2017) |> 
   dplyr::select(
     "SPEI 12" = spei_spei12, 
@@ -110,7 +110,7 @@ df_sum <- data %>%
     "Informality share (/workforce) W" = s_casual_w_worker_W_unw,
     "Informality share (/workforce) WD" = s_casual_w_worker_WD_unw,
     "State population" = state_pop
-  ) %>%
+  ) |> 
   mutate(across(everything(), as.numeric))
 
 # variables using population weights
@@ -151,7 +151,7 @@ summary_table <- lapply(names(df_sum)[names(df_sum) != "State population"], func
     Max = max(x, na.rm = TRUE)
   )
   
-}) %>%
+}) |> 
   bind_rows()
 
 # print nicely

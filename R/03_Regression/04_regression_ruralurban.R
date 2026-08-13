@@ -7,12 +7,12 @@ colnames(data)
 
 library(dplyr)
 
-df <- data %>%
-  group_by(STATE) %>%
+df <- data |> 
+  group_by(STATE) |> 
   mutate(
     pop_rur_unw_2017 = max(if_else(year == 2017, pop_rur_unw, NA_real_), na.rm = TRUE),
     pop_urb_unw_2017 = max(if_else(year == 2017, pop_urb_unw, NA_real_), na.rm = TRUE)
-  ) %>%
+  ) |> 
   ungroup()
 
 data <- df

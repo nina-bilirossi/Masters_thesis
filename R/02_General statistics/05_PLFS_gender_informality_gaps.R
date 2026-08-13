@@ -1,6 +1,7 @@
 
 # ==============================================================================
-# This script 
+# This script compares and generates visualizations of male and female informality data 
+
 # ==============================================================================
 
 
@@ -14,17 +15,17 @@ df <- data
 colnames(data)
 
 # ── Reshape to long format ─────────────────────────────────────────────────────
-df_long <- df %>%
+df_long <- df |>
   rename(
     female = s_casual_w_worker_PS_f_unw,
     male   = s_casual_w_worker_PS_m_unw,
     overall = s_casual_w_worker_PS_unw
-  ) %>%
+  ) |>
   pivot_longer(
     cols      = c(female, male, overall),
     names_to  = "gender",
     values_to = "informality_rate"
-  ) |>  select(gender, STATE, year, informality_rate, pop_f_unw, pop_m_unw, state_pop)
+  ) |>  dplyr::select(gender, STATE, year, informality_rate, pop_f_unw, pop_m_unw, state_pop)
 
 head(df_long)
 
@@ -40,17 +41,17 @@ uts_to_drop <- c(
   "PUDUCHERRY"
 )
 
-df_long <- df %>%
+df_long <- df |> 
   filter(!STATE %in% uts_to_drop)
 df <- df_long
 
 # ── 1. National trends (average across states) ────────────────────────────────
-national <- df %>%
-  group_by(year, gender) %>%
+national <- df |> 
+  group_by(year, gender) |> 
   summarise(rate = mean(informality_rate, na.rm = TRUE), .groups = "drop")
 
-national_ci <- df_long %>%
-  group_by(year, gender) %>%
+national_ci <- df_long |> 
+  group_by(year, gender) |> 
   summarise(
     rate  = weighted.mean(informality_rate, w = state_pop, na.rm = TRUE),
     lower = quantile(informality_rate, 0.1, na.rm = TRUE),
@@ -58,12 +59,12 @@ national_ci <- df_long %>%
     .groups = "drop"
   )
 
-outliers <- df_long %>%
-  left_join(national_ci %>% select(year, gender, lower, upper),
-            by = c("year", "gender")) %>%
+outliers <- df_long |> 
+  left_join(national_ci |> select(year, gender, lower, upper),
+            by = c("year", "gender")) |>
   filter(informality_rate < lower | informality_rate > upper)
 
-national_ci2 <- national_ci %>%
+national_ci2 <- national_ci |>
   filter(gender != "overall")
 p1 <- ggplot(national_ci2, aes(x = year, colour = gender, fill = gender, group = gender)) +
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1, colour = NA) +
@@ -84,8 +85,8 @@ p1 <- ggplot(national_ci2, aes(x = year, colour = gender, fill = gender, group =
 
 p1
 # ── 2. Gender gap evolution (female − male, per year) ─────────────────────────
-gap_national <- national %>%
-  pivot_wider(names_from = gender, values_from = rate) %>%
+gap_national <- national |>
+  pivot_wider(names_from = gender, values_from = rate) |>
   mutate(gap = female - male)
 
 p2 <- ggplot(gap_national, aes(x = year, y = gap, fill = gap > 0)) +
@@ -101,10 +102,10 @@ p2
 
 length(unique(df_long$STATE))
 
-gap_ci <- df_long %>%
-  pivot_wider(names_from = gender, values_from = informality_rate) %>%
-  mutate(gap = female - male) %>%
-  group_by(year) %>%
+gap_ci <- df_long |>
+  pivot_wider(names_from = gender, values_from = informality_rate) |>
+  mutate(gap = female - male) |>
+  group_by(year) |>
   summarise(
     gap_avg = weighted.mean(gap, w = state_pop, na.rm = TRUE),
     lower   = quantile(gap, 0.1, na.rm = TRUE),
@@ -112,10 +113,10 @@ gap_ci <- df_long %>%
     .groups = "drop"
   )
 
-gap_outliers <- df_long %>%
-  pivot_wider(names_from = gender, values_from = informality_rate) %>%
-  mutate(gap = female - male) %>%
-  left_join(gap_ci %>% select(year, lower, upper), by = "year") %>%
+gap_outliers <- df_long |>
+  pivot_wider(names_from = gender, values_from = informality_rate) |>
+  mutate(gap = female - male) |>
+  left_join(gap_ci |> dplyr::select(year, lower, upper), by = "year") |>
   filter(gap < lower | gap > upper)
 
 p2 <- ggplot(gap_ci, aes(x = year)) +
@@ -140,8 +141,8 @@ p2 <- ggplot(gap_ci, aes(x = year)) +
 p2
 library(ggrepel)
 
-gap_states <- df_long %>%
-  pivot_wider(names_from = gender, values_from = informality_rate) %>%
+gap_states <- df_long |>
+  pivot_wider(names_from = gender, values_from = informality_rate) |>
   mutate(gap = female - male)
 
 p2_2 <- ggplot() +
@@ -174,11 +175,11 @@ p2_2 <- ggplot() +
 p2_2
 
 # ── 3. Gender gap by state (averaged across all years) ────────────────────────
-gap_state <- df %>%
-  pivot_wider(names_from = gender, values_from = informality_rate) %>%
-  mutate(gap = female - male) %>%
-  group_by(STATE) %>%
-  summarise(gap_avg = mean(gap, na.rm = TRUE), .groups = "drop") %>%
+gap_state <- df |>
+  pivot_wider(names_from = gender, values_from = informality_rate) |>
+  mutate(gap = female - male) |>
+  group_by(STATE) |>
+  summarise(gap_avg = mean(gap, na.rm = TRUE), .groups = "drop") |>
   mutate(state = fct_reorder(STATE, gap_avg))
 
 p3 <- ggplot(gap_state, aes(x = gap_avg, y = state, fill = gap_avg > 0)) +
@@ -207,11 +208,11 @@ p4 <- ggplot(df, aes(x = year, y = informality_rate,
 
 p4
 # ── 5. State clustering by trend slope ────────────────────────────────────────
-slopes <- df %>%
-  group_by(STATE, gender) %>%
-  summarise(slope = coef(lm(informality_rate ~ year))[["year"]], .groups = "drop") %>%
-  pivot_wider(names_from = gender, values_from = slope) %>%
-  rename(slope_m = male, slope_f = female) %>%
+slopes <- df |>
+  group_by(STATE, gender) |>
+  summarise(slope = coef(lm(informality_rate ~ year))[["year"]], .groups = "drop") |>
+  pivot_wider(names_from = gender, values_from = slope) |>
+  rename(slope_m = male, slope_f = female) |>
   mutate(cluster = case_when(
     slope_m < -0.5 & slope_f < -0.5 ~ "Both declining",
     slope_m >  0.3 | slope_f >  0.3 ~ "Rising",

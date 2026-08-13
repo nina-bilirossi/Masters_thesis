@@ -5,7 +5,7 @@ library(knitr)
 df_sections_agri <- read.csv("/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/final material/regression_dataframe_july_agri.csv")
 
 # 1. Overall Mean and SE for the entire dataset
-overall_stats <- data %>%
+overall_stats <- data |> 
   summarise(across(
     c(spei_negative, FI_state, pr_score),
     list(
@@ -15,18 +15,18 @@ overall_stats <- data %>%
       max  = ~ max(.x, na.rm = TRUE)
     ),
     .names = "{.col}_{.fn}"
-  )) %>%
+  )) |> 
   pivot_longer(
     everything(),
     names_to = c("Variable", ".value"),
     names_pattern = "(.*)_(mean|se|min|max)"
-  ) %>%
+  ) |> 
   mutate(agri_group = "Overall")
 
 # 2. Group-specific Mean, SE, Min, and Max (High vs Low Agri)
-group_stats <- df_sections_agri %>%
-  filter(agri_group %in% c("High agri", "Low agri")) %>% 
-  group_by(agri_group) %>%
+group_stats <- df_sections_agri |> 
+  filter(agri_group %in% c("High agri", "Low agri")) |>  
+  group_by(agri_group) |> 
   summarise(across(
     c(spei_negative, FI_state, pr_score),
     list(
@@ -36,7 +36,7 @@ group_stats <- df_sections_agri %>%
       max  = ~ max(.x, na.rm = TRUE)
     ),
     .names = "{.col}_{.fn}"
-  )) %>%
+  )) |> 
   pivot_longer(
     cols = -agri_group,
     names_to = c("Variable", ".value"),
@@ -44,8 +44,8 @@ group_stats <- df_sections_agri %>%
   )
 
 # 3. Combine both and format into LaTeX
-summary_table <- bind_rows(overall_stats, group_stats) %>%
-  dplyr::select(agri_group, Variable, mean, se, min, max) %>%
+summary_table <- bind_rows(overall_stats, group_stats) |> 
+  dplyr::select(agri_group, Variable, mean, se, min, max) |> 
   arrange(desc(agri_group), Variable)
 
 # Generate Clean LaTeX Code
@@ -75,7 +75,7 @@ plot_data <- data.frame(
 )
 
 # 2. Calculate 95% Confidence Intervals & lock factor ordering
-plot_data <- plot_data %>%
+plot_data <- plot_data |> 
   mutate(
     ci_lower = Mean - 1.96 * SD,
     ci_upper = Mean + 1.96 * SD,

@@ -1,0 +1,12 @@
+Welcome to the thrid and last step of running the R regression for my master's thesis!
+
+This part is contains all the informality and robustness regressions.
+
+All the necessary data to run the scripts in this folder is either computed at the previous step (01_Data_cleaning) or is located in the attached data folder, under '/submission/Data/R/final dataframe construction'.
+
+It is best to follow the numbering order.
+
+Feel free to reach out if you have any questions or difficulties accessing the data: nina.bilirossi@gmail.com
+
+Best,
+Nina

@@ -35,24 +35,24 @@ industry_labels <- c(
 # ------------------------------------------------------------------
 # Filter to the 2017-18 baseline round and reshape to long format
 # ------------------------------------------------------------------
-baseline <- industry_data %>%
-  filter(data == "PLFS_1718") %>%
-  dplyr::select(state_name, all_of(names(industry_labels))) %>%
+baseline <- industry_data |> 
+  filter(data == "PLFS_1718") |> 
+  dplyr::select(state_name, all_of(names(industry_labels))) |> 
   pivot_longer(
     cols      = -state_name,
     names_to  = "industry_code",
     values_to = "share"
-  ) %>%
+  ) |> 
   mutate(industry = factor(industry_labels[industry_code], levels = industry_labels))
 
 # Order states by their Agriculture share, so the chart reads from
 # most agrarian (top) to least agrarian (bottom) economies
-state_order <- baseline %>%
-  filter(industry == "Agriculture, Forestry & Fishing") %>%
-  arrange(share) %>%
+state_order <- baseline |> 
+  filter(industry == "Agriculture, Forestry & Fishing") |> 
+  arrange(share) |> 
   pull(state_name)
 
-baseline <- baseline %>%
+baseline <- baseline |> 
   mutate(state_name = factor(state_name, levels = state_order))
 
 # ------------------------------------------------------------------
@@ -126,7 +126,7 @@ industry_short <- c(
   share_div9_weighted  = "Services"
 )
 
-industry_clean <- industry_data %>%
+industry_clean <- industry_data |> 
   mutate(state_name = case_match(
     state_name,
     "JAMMU & KASHMIR" ~ "JAMMU AND KASHMIR",
@@ -138,10 +138,10 @@ industry_clean <- industry_data %>%
     "A & N ISLANDS"   ~ "ANDAMAN & NICOBAR",
     "D & N. HAVELI & DAMAN & DIU" ~ "DADRA & NAGAR HAVELI & DAMAN & DIU",
     .default = state_name
-  )) %>%
-  mutate(year = as.numeric(paste0("20", str_sub(str_remove(data, "PLFS_"), 1, 2)))) %>%
-  rename(STATE = state_name) %>%
-  dplyr::select(STATE, year, all_of(names(industry_short))) %>%
+  )) |> 
+  mutate(year = as.numeric(paste0("20", str_sub(str_remove(data, "PLFS_"), 1, 2)))) |> 
+  rename(STATE = state_name) |> 
+  dplyr::select(STATE, year, all_of(names(industry_short))) |> 
   rename(!!!setNames(names(industry_short), paste0("share_", industry_short)))
 # produces columns: share_Agriculture, share_Mining, share_Manufacturing,
 # share_Utilities, share_Construction, share_Trade, share_Transport,
@@ -153,12 +153,12 @@ sector_cols <- paste0("share_", industry_short)  # all 9 outcome variable names
 # STEP 2: Merge into `data`
 # ══════════════════════════════════════════════════════════════════
 
-data_indu <- data %>%
+data_indu <- data |> 
   left_join(industry_clean, by = c("STATE", "year"))
 
 # Quick check for join failures
-data_indu %>%
-  filter(!is.na(spei_negative) | !is.na(FI_state)) %>%
+data_indu |> 
+  filter(!is.na(spei_negative) | !is.na(FI_state)) |> 
   summarise(across(all_of(sector_cols), ~ sum(is.na(.)), .names = "missing_{.col}"))
 
 # ------------------------------------------------------------------
@@ -169,22 +169,22 @@ short_to_full <- setNames(industry_labels, industry_short)
 # ------------------------------------------------------------------
 # National baseline (2017-18) pie chart, weighted by state population
 # ------------------------------------------------------------------
-baseline_national <- data_indu %>%
-  filter(data == "PLFS_1718") %>%
-  dplyr::select(STATE, state_pop, all_of(sector_cols)) %>%
+baseline_national <- data_indu |> 
+  filter(data == "PLFS_1718") |> 
+  dplyr::select(STATE, state_pop, all_of(sector_cols)) |> 
   pivot_longer(
     cols      = all_of(sector_cols),
     names_to  = "industry_short",
     values_to = "share"
-  ) %>%
+  ) |> 
   mutate(
     industry_short = str_remove(industry_short, "^share_"),
     industry = factor(short_to_full[industry_short], levels = industry_labels)
-  ) %>%
+  ) |> 
   # weighted average share across states, weights = each state's population
-  group_by(industry) %>%
-  summarise(national_share = weighted.mean(share, w = state_pop, na.rm = TRUE)) %>%
-  ungroup() %>%
+  group_by(industry) |> 
+  summarise(national_share = weighted.mean(share, w = state_pop, na.rm = TRUE)) |> 
+  ungroup() |> 
   mutate(
     national_share = national_share / sum(national_share),  # renormalize to 100%
     label = paste0(industry, "\n", scales::percent(national_share, accuracy = 0.1))

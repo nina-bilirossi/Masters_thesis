@@ -13,17 +13,17 @@ states_plfs
 states_spei <- unique(spei_long$state_name)
 
 # figuring out which states do not have a match
-unmatched_states1 <- plfs %>%
-  anti_join(spei_long, by = c("state_name")) %>%
+unmatched_states1 <- plfs |> 
+  anti_join(spei_long, by = c("state_name")) |> 
   distinct(state_name)
-unmatched_states2 <- spei_long %>%
-  anti_join(plfs, by = c("state_name")) %>%
+unmatched_states2 <- spei_long |> 
+  anti_join(plfs, by = c("state_name")) |> 
   distinct(state_name)
 
 unmatched_states1
 unmatched_states2
 
-plfs <- plfs %>%
+plfs <- plfs |> 
   mutate(state_name = recode(state_name,
                              #"JAMMU AND KASHMIR" = "JAMMU & KASHMIR",
                              "UTTARANCHAL" = "UTTARAKHAND",

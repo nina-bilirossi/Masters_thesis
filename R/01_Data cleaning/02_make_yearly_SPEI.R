@@ -45,8 +45,8 @@ districts_final <- st_drop_geometry(districts) |>
   dplyr::select(STATE_UT, DISTRICT, pop_total) |> 
   mutate(STATE_UT = ifelse(STATE_UT == "UTTAR>KHAND", "UTTARAKHAND", STATE_UT))
 
-state_population <- districts_final %>%
-  group_by(STATE_UT) %>%
+state_population <- districts_final |> 
+  group_by(STATE_UT) |> 
   summarise(state_pop = sum(pop_total, na.rm = TRUE))
 
 write.csv(districts_final, "~/Desktop/MSC THESIS/Data works/Code/Outputs/district_population.csv", row.names = FALSE)
@@ -66,16 +66,16 @@ compute_state_weighted_SPEI <- function(spei_nc_file, year,
   states$mean_SPEI12 <- exact_extract(spei_raster, states, 'mean')
   districts$mean_SPEI12 <- exact_extract(spei_raster, districts, 'mean')
   
-  state_scores <- districts %>%
-    st_drop_geometry() %>%   # <-- ADD THIS
-    group_by(STATE_UT) %>%
+  state_scores <- districts |> 
+    st_drop_geometry() |>    # <-- ADD THIS
+    group_by(STATE_UT) |> 
     summarise(weighted_SPEI12 = sum(mean_SPEI12 * pop_total, na.rm = TRUE) / 
                 sum(pop_total, na.rm = TRUE),
               unweighted_SPEI12 = mean(mean_SPEI12, na.rm = TRUE)
     ) |>  rename(STATE = STATE_UT)
   
   # --- CRITICAL FIX: CLEAN NAMES BEFORE JOINING ---
-  state_scores <- state_scores %>%
+  state_scores <- state_scores |> 
     mutate(STATE = case_when(
       STATE == "UTTAR>KHAND" ~ "UTTARAKHAND",
       STATE == "ANDAMAN AND NICOBAR ISLANDS" ~ "ANDAMAN & NICOBAR",
@@ -86,7 +86,7 @@ compute_state_weighted_SPEI <- function(spei_nc_file, year,
   states$STATE[states$STATE == "UTTAR>KHAND"] <- "UTTARAKHAND"
   
   # For plotting, use a separate spatial version
-  state_scores_sf <- states %>%
+  state_scores_sf <- states |> 
     left_join(st_drop_geometry(state_scores), by = "STATE")
   
   p_states <- ggplot(state_scores_sf) +
@@ -144,18 +144,18 @@ for (file in nc_files) {
 
 raw <- spei_yearly
 
-spei_long <- spei_yearly %>%
+spei_long <- spei_yearly |> 
   pivot_longer(
     cols = -STATE,
     names_to = c("type", "year"),
     names_pattern = "(weighted|unweighted)_SPEI12_(\\d+)",
     values_to = "spei12"
-  ) %>%
+  ) |> 
   mutate(year = as.numeric(year)) |> 
   rename(state_name = STATE) |> 
   mutate(state_name = toupper(state_name))
 
-spei_long <- spei_long %>%
+spei_long <- spei_long |> 
   mutate(negative = ifelse(spei12 > 0, 0, spei12)) |> 
   mutate(positive = ifelse(spei12 < 0, 0, spei12))
   
