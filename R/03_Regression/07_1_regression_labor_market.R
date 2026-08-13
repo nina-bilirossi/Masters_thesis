@@ -1,6 +1,13 @@
-# what is the effect of the shocks on labor force participation (lf/pop), employment (workers/lf), unemployment
-library(stargazer)
-library(dplyr)
+
+# ==============================================================================
+# This script runs regressions to analyze the impact of the drougth and flood
+# indices on different labor market measures.
+# Results are presented in stargazer tables for export.
+
+# see Manuscript: Empirical Strategy for details.
+
+# ==============================================================================
+
 
 # ── SOME SUMMARY STATISTICS & data cleaning ──────────────
 

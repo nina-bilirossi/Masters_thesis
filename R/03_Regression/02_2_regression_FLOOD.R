@@ -1,12 +1,12 @@
-# REGRESSING ON WORKERS
 
-# We run a regression with the optimal lags for Flood Index (2 lags for both) and we report the results in a stargazer table.
-# Specifications:
-# 2 way FE
-# Clustered SE at the state level
-# run only with 1 measure of informality for now
-# test the following flood indices: the FI index (excluding the 2 states taht don't have indices), and the pr index (all states but LAKSHADWEEP, as usual)
-# both with 2 lags
+# ==============================================================================
+# This script runs regressions to analyze the impact of flood indices
+# on informality in the general population.
+
+# Results are presented in stargazer tables for export.
+
+# ==============================================================================
+
 
 out <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/regressions/weighted_workers"
 dir.create(out, recursive = TRUE, showWarnings = FALSE)

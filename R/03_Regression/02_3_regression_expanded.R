@@ -1,19 +1,14 @@
-# REGRESSION WITH BOTH CLIMATE SHOCK AND FLOOD INDEX, WITH THE OPTIMAL LAGS (3, 2)
-# final display, redundant of/épurée version docs 02 and 03
 
-# ══════════════════════════════════════════════════════════════════════════════
+# ==============================================================================
+# This script runs regressions to analyze the impact of drought and flood indices
+# on informality in the general population.
+
+# It overlaps with file 02_1 and 02_2, joining them in a table 
+# ready to export to latex.
+
+# ==============================================================================
+
 # MAIN REGRESSIONS – GENERAL POPULATION
-# ══════════════════════════════════════════════════════════════════════════════
-# Estimates the effect of climate shocks (negative SPEI-12 drought index and
-# Flood Index, both with optimal lags) on labor informality (casual worker
-# share) using state and year fixed effects, state-specific linear trends,
-# and population weights. Clustered standard errors (by state) are computed
-# and results exported via stargazer.
-#
-#
-# ══════════════════════════════════════════════════════════════════════════════
-
-
 data_robust <-  data |> filter(STATE != "PUDUCHERRY" & STATE != "DADRA & NAGAR HAVELI & DAMAN & DIU") |>
   filter(STATE != "JAMMU AND KASHMIR" & STATE != "LADAKH")
 data_flood_robust <- data_flood |> filter(STATE != "PUDUCHERRY" & STATE != "DADRA & NAGAR HAVELI & DAMAN & DIU") |> 

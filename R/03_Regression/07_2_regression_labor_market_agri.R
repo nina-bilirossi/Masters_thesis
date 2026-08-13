@@ -1,4 +1,15 @@
 
+# ==============================================================================
+# This script runs regressions to analyze the impact of the drougth and flood
+# indices on different labor market measures, with states divided according to 
+# their agricultural share of employment (high/low group).
+
+# Results are presented in stargazer tables for export.
+
+# see Manuscript: Empirical Strategy for details.
+
+# ==============================================================================
+
 
 # AGRI STATE SPLIT
 

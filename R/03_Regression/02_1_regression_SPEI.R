@@ -1,11 +1,19 @@
 
-# We run a regression with the optimal lags for SPEI Index (2 lags for both) and we report the results in a stargazer table.
+# ==============================================================================
+# This script runs regressions to analyze the impact of both the drougth index 
+# and the full-SPEI on informality in the general population.
+# Results are presented in stargazer tables for export.
+
 # Specifications:
 # 2 way FE
 # Clustered SE at the state level
 # run only with 1 measure of informality for now
 # test the following SPEI: only the negative values, and full SPEI
 # both with 2 lags
+
+# see Manuscript: Empirical Strategy for details
+
+# ==============================================================================
 
 out <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/regressions/weighted_workers_no_UT"
 dir.create(out, recursive = TRUE, showWarnings = FALSE)

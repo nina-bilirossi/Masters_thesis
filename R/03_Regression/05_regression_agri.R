@@ -1,3 +1,15 @@
+# ==============================================================================
+# This script runs regressions to analyze the impact of the drougth and flood
+# indices on informality among states with high/low agricultural share of 
+# employment separately. 
+
+# Results are presented in stargazer tables for export.
+
+# see Manuscript: section 3.Labor Market Data for details.
+
+# ==============================================================================
+
+
 df_sections_agri <- df_sections  |> 
   filter(!is.na(agri_group))
 

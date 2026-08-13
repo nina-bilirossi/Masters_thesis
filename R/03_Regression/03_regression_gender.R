@@ -1,8 +1,11 @@
-# REGRESSING ON WORKERS
+# ==============================================================================
+# This script runs regressions to analyze the impact of the drougth and flood
+# indices on informality among men and women separately. 
+# Results are presented in stargazer tables for export.
 
-#new weights
+# see Manuscript: Empirical Strategy for details.
 
-library(dplyr)
+# ==============================================================================
 
 df <- data |> 
   group_by(STATE) |> 

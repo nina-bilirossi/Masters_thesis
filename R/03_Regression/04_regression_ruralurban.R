@@ -1,11 +1,18 @@
-# REGRESSING ON WORKERS
+# ==============================================================================
+# This script runs regressions to analyze the impact of the drougth and flood
+# indices on informality among rural and urban areas separately. 
+# Results are presented in stargazer tables for export.
+
+# see Manuscript: Empirical Strategy for details.
+
+# ==============================================================================
+
+
 # ── Output paths ───────────────────────────────────────────────────────────────
 out  <- "/Users/ninabilirossi/Desktop/MSC THESIS/Data works/Code/Outputs/regressions/weighted_workers"
 dir.create(out,  recursive = TRUE, showWarnings = FALSE)
 
 colnames(data)
-
-library(dplyr)
 
 df <- data |> 
   group_by(STATE) |> 

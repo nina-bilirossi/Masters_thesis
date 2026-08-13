@@ -1,3 +1,14 @@
+# ==============================================================================
+# This script runs regressions to analyze the impact of the drougth and flood
+# indices on informality among states with high/low GSDP.
+
+# Results are presented in stargazer tables for export.
+
+# see Manuscript: section 3.Labor Market Data for details.
+
+# ==============================================================================
+
+
 # 1. Classify states into 2 groups based on GDP per capita
 # 2. Run regressions for each group separately
 
@@ -41,18 +52,18 @@ low_income_states <- c(
   "PUNJAB"
 )
 
-df_income <- data %>%
+df_income <- data |> 
   mutate(
     income_group = case_when(
       STATE %in% high_income_states ~ "High income",
       STATE %in% low_income_states  ~ "Low income",
       TRUE ~ NA_character_
-    ) %>% factor(levels = c("Low income", "High income"))
+    ) |>  factor(levels = c("Low income", "High income"))
   )
 
 # Sanity check — any STATE values that didn't match either list?
-df_income %>%
-  filter(is.na(income_group)) %>%
+df_income |> 
+  filter(is.na(income_group)) |> 
   distinct(STATE)
 
 income_states_df <- tibble(
@@ -63,12 +74,12 @@ income_states_df <- tibble(
   )
 )
 # 
-# unmatched_states1 <- income_states_df %>%
-#   anti_join(data, by = "STATE") %>%
+# unmatched_states1 <- income_states_df |> 
+#   anti_join(data, by = "STATE") |> 
 #   distinct(STATE)
 # 
-# unmatched_states2 <- data %>%
-#   anti_join(income_states_df, by = "STATE") %>%
+# unmatched_states2 <- data |> 
+#   anti_join(income_states_df, by = "STATE") |> 
 #   distinct(STATE)
 # 
 # unmatched_states1
@@ -81,7 +92,7 @@ income_states_df <- tibble(
 
 # 2 regressions
 
-df_sections_income <- df_income %>%
+df_sections_income <- df_income |> 
   filter(!is.na(income_group)) |> 
   filter(STATE != "ARUNACHAL PRADESH") |> 
   filter(STATE != "MEGHALAYA")
@@ -89,25 +100,25 @@ df_sections_income <- df_income %>%
 m_income_high_spei <- lm(s_casual_w_worker_W_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 +
                            spei_neg_spei_lag3 +
                            factor(STATE) + factor(year) + factor(STATE):year,
-                         data = df_sections_income %>% filter(income_group == "High income"), weights = state_pop)
+                         data = df_sections_income |>  filter(income_group == "High income"), weights = state_pop)
 m_income_low_spei <- lm(s_casual_w_worker_W_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 +
                           spei_neg_spei_lag3 +
                           factor(STATE) + factor(year) + factor(STATE):year,
-                        data = df_sections_income %>% filter(income_group == "Low income"), weights = state_pop)
+                        data = df_sections_income |>  filter(income_group == "Low income"), weights = state_pop)
 
 m_income_high_fi <- lm(s_casual_w_worker_W_unw ~ FI_state + FI_lag1 + FI_lag2 +
                          factor(STATE) + factor(year) + factor(STATE):year,
-                       data = df_sections_income %>% filter(income_group == "High income"), weights = state_pop)
+                       data = df_sections_income |>  filter(income_group == "High income"), weights = state_pop)
 m_income_low_fi <- lm(s_casual_w_worker_W_unw ~ FI_state + FI_lag1 + FI_lag2 +
                         factor(STATE) + factor(year) + factor(STATE):year,
-                      data = df_sections_income %>% filter(income_group == "Low income"), weights = state_pop)
+                      data = df_sections_income |>  filter(income_group == "Low income"), weights = state_pop)
 
 m_income_high_pr <- lm(s_casual_w_worker_W_unw ~ pr_score + pr_lag1 + pr_lag2 +
                          factor(STATE) + factor(year) + factor(STATE):year,
-                       data = df_sections_income %>% filter(income_group == "High income"), weights = state_pop)
+                       data = df_sections_income |>  filter(income_group == "High income"), weights = state_pop)
 m_income_low_pr <- lm(s_casual_w_worker_W_unw ~ pr_score + pr_lag1 + pr_lag2 +
                         factor(STATE) + factor(year) + factor(STATE):year,
-                      data = df_sections_income %>% filter(income_group == "Low income"), weights = state_pop)
+                      data = df_sections_income |>  filter(income_group == "Low income"), weights = state_pop)
 
 
 se_high_spei <- cluster_se(m_income_high_spei)
@@ -188,14 +199,14 @@ library(tidyr)
 
 # Reshape to long format so pr_score and FI_state can be plotted together
 plot_data <- data |> 
-  dplyr::select(STATE, year, spei_spei12, pr_score, FI_state) %>%
+  dplyr::select(STATE, year, spei_spei12, pr_score, FI_state) |> 
   filter(STATE == "ANDHRA PRADESH") |> 
   pivot_longer(
     cols = c(pr_score, FI_state, spei_spei12),
     names_to = "indicator",
     values_to = "value"
-  ) %>%
-  filter(!is.na(value)) %>%
+  ) |> 
+  filter(!is.na(value)) |> 
   filter(!grepl("DISPUTED", STATE))
 
 # Faceted plot: one panel per state, PR and FI as separate lines
@@ -231,25 +242,25 @@ andhra <- data |> filter(STATE == "ANDHRA PRADESH")
 m_income_high_spei_urb <- lm(s_casual_w_worker_PS_urb_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 +
                            spei_neg_spei_lag3 +
                            factor(STATE) + factor(year), # + factor(STATE):year,
-                         data = df_sections_income %>% filter(income_group == "High income"), weights = state_pop)
+                         data = df_sections_income |>  filter(income_group == "High income"), weights = state_pop)
 m_income_low_spei_urb <- lm(s_casual_w_worker_PS_urb_unw ~ spei_negative + spei_neg_spei_lag1 + spei_neg_spei_lag2 +
                           spei_neg_spei_lag3 +
                           factor(STATE) + factor(year), # + factor(STATE):year,
-                        data = df_sections_income %>% filter(income_group == "Low income"), weights = state_pop)
+                        data = df_sections_income |>  filter(income_group == "Low income"), weights = state_pop)
 
 m_income_high_fi_urb <- lm(s_casual_w_worker_PS_urb_unw ~ FI_state + FI_lag1 + FI_lag2 +
                          factor(STATE) + factor(year), # + factor(STATE):year,
-                       data = df_sections_income %>% filter(income_group == "High income"), weights = state_pop)
+                       data = df_sections_income |>  filter(income_group == "High income"), weights = state_pop)
 m_income_low_fi_urb <- lm(s_casual_w_worker_PS_urb_unw ~ FI_state + FI_lag1 + FI_lag2 +
                         factor(STATE) + factor(year), # + factor(STATE):year,
-                      data = df_sections_income %>% filter(income_group == "Low income"), weights = state_pop)
+                      data = df_sections_income |>  filter(income_group == "Low income"), weights = state_pop)
 
 m_income_high_pr_urb <- lm(s_casual_w_worker_PS_urb_unw ~ pr_score + pr_lag1 + pr_lag2 +
                          factor(STATE) + factor(year), # + factor(STATE):year,
-                       data = df_sections_income %>% filter(income_group == "High income"), weights = state_pop)
+                       data = df_sections_income |>  filter(income_group == "High income"), weights = state_pop)
 m_income_low_pr_urb <- lm(s_casual_w_worker_PS_urb_unw ~ pr_score + pr_lag1 + pr_lag2 +
                         factor(STATE) + factor(year), # + factor(STATE):year,
-                      data = df_sections_income %>% filter(income_group == "Low income"), weights = state_pop)
+                      data = df_sections_income |>  filter(income_group == "Low income"), weights = state_pop)
 
 
 se_high_spei <- cluster_se(m_income_high_spei_urb)

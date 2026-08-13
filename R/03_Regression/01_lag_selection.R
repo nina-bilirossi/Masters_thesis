@@ -1,3 +1,4 @@
+
 # ==============================================================================
 # LAG SELECTION
 # this code is used to determine the optimal number of lags for the drought and 
@@ -5,11 +6,6 @@
 
 # ==============================================================================
 
-library(plm)
-library(lmtest)
-library(vars)
-library(sandwich)
-library(stargazer)
 
 # Define a function to extract AIC/BIC for plm
 # plm doesn't have a default AIC method, so we calculate it from the Likelihood
