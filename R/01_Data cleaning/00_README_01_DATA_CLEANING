@@ -1,0 +1,15 @@
+Hello,
+
+Welcome to step one of running the R regression for my master's thesis!
+
+All the necessary data to run the scripts in this folder should be located in the attached data folder, under '/submission/Data/R/final dataframe construction'.
+
+You can run the script by following the numbering order.
+
+Feel free to reach out if you have any questions or difficulties accessing the data: nina.bilirossi@gmail.com
+
+
+Best,
+Nina
+
+Note that files in the archived folders are background work that helped me make sense of the data, but are not included in the final thesis. The filepaths in those archived scripts are not up to date.

@@ -1,0 +1,16 @@
+Welcome to step two of running the R regression for my master's thesis!
+
+This part is not mandatory to obtain the regression results. 
+
+You will find here general-to-specific summary statistics for the climate, labor, and state data (e.g. share of agricultural employment...)
+
+All the necessary data to run the scripts in this folder is either computed at the previous step (01_Data_cleaning) or is located in the attached data folder, under '/submission/Data/R/final dataframe construction'.
+
+The exception to this is the ILOSTAT data, which can be retrieved directly from the ILO database.
+
+You can run the script by following the numbering order, though the order matters little in this folder.
+
+Feel free to reach out if you have any questions or difficulties accessing the data: nina.bilirossi@gmail.com
+
+I will see you soon for the deep dive into the regression,
+Nina
