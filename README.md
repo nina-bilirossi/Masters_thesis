@@ -15,13 +15,16 @@ To do everything from scratch:
 1. Download the shapefiles (.shp, .gpx, ...) and population raster (.tif):
    
     boundaries: https://surveyofindia.gov.in/pages/administrative-boundary-data-base-abdb-
-           I couldn’t find the date for that shapefile/boundary definition but observing that Andhra Pradesh has 26 districts instead of 13, I deduct that the data is post-April 2022.
+           I couldn’t find the date for that shapefile/boundary definition, but observing that Andhra Pradesh has 26 districts instead of 13, I deduce that the data is post-April 2022.
    
     population raster: https://hub.worldpop.org/geodata/summary?id=6527
-3. Download the satellite data using the Python/data_retrieval_copernicus_thesis.ipynb (instriuctions to connect to GEE are included there).
-4. Process the data using the python files in the 'Python' folder, in the order indicated by the numbers.
+3. Download the satellite data using the Python/data_retrieval_copernicus_thesis.ipynb (instructions to connect to GEE are included there).
+4. Process the data using the Python files in the 'Python' folder, in the order indicated by the numbers.
 5. Download the PLFS data and run the code in R > Data cleaning.
 6. Run the regressions.
 
 
 If any questions, you can reach me by email!
+
+
+PS: Note that I included some sample outputs in the Output folder, but more extensive outputs are generated in the R code. All essential outputs (summary statistics, graphs, maps, tables) are in the manuscript itself.
